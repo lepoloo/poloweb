@@ -18,7 +18,7 @@ models.Base.metadata.create_all(bind=engine)
 
 # /profil_privileges/
 
-router = APIRouter(prefix = "/profil_privilege", tags=['Privileges roles Requests'])
+router = APIRouter(prefix = "/profil_privilege", tags=['Profil privilege Requests'])
  
 # create a new profil_privilege sheet
 @router.post("/create/", status_code = status.HTTP_201_CREATED, response_model=profil_privileges_schemas.ProfilPrivilegeListing)
