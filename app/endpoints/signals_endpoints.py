@@ -77,9 +77,8 @@ async def read_signals_actif(skip: int = 0, limit: int = 100, db: Session = Depe
     signals_queries = db.query(models.Signal).filter(models.Signal.active == "True").order_by(models.Signal.create_at).offset(skip).limit(limit).all()
     
     # pas de signal
-    if not signals_queries:
-       
-        raise HTTPException(status_code=404, detail="signal not found")
+    # if not signals_queries:
+    #     raise HTTPException(status_code=404, detail="signal not found")
                         
     return jsonable_encoder(signals_queries)
 

@@ -52,9 +52,8 @@ async def read_anounces_actif(skip: int = 0, limit: int = 100, db: Session = Dep
     anounces_queries = db.query(models.Anounce).filter(models.Anounce.active == "True").order_by(models.Anounce.created_at).offset(skip).limit(limit).all()
     
     # pas de anounce
-    if not anounces_queries:
-       
-        raise HTTPException(status_code=404, detail="Anounce not found")
+    # if not anounces_queries:
+    #     raise HTTPException(status_code=404, detail="Anounce not found")
                         
     return jsonable_encoder(anounces_queries)
 
@@ -177,9 +176,8 @@ async def read_anounces_inactive(skip: int = 0, limit: int = 100, db: Session = 
     anounces_queries = db.query(models.Anounce).filter(models.Anounce.active == "False").order_by(models.Anounce.created_at).offset(skip).limit(limit).all()
     
     # pas de anounce
-    if not anounces_queries:
-       
-        raise HTTPException(status_code=404, detail="anounces not found")
+    # if not anounces_queries:
+    #     raise HTTPException(status_code=404, detail="anounces not found")
                         
     return jsonable_encoder(anounces_queries)
 

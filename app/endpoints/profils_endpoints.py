@@ -55,9 +55,8 @@ async def read_profils_actif(skip: int = 0, limit: int = 100, db: Session = Depe
     profils_queries = db.query(models.Profil).filter(models.Profil.active == "True").order_by(models.Profil.fucntion).offset(skip).limit(limit).all()
     
     # pas de profil
-    if not profils_queries:
-       
-        raise HTTPException(status_code=404, detail="profil not found")
+    # if not profils_queries:
+    #     raise HTTPException(status_code=404, detail="profil not found")
                         
     return jsonable_encoder(profils_queries)
 
@@ -165,8 +164,8 @@ async def read_profils_inactive(skip: int = 0, limit: int = 100, db: Session = D
     profils_queries = db.query(models.Profil).filter(models.Profil.active == "False").order_by(models.Profil.fucntion).offset(skip).limit(limit).all()
     
     # pas de profil
-    if not profils_queries:
-        raise HTTPException(status_code=404, detail="profils not found")
+    # if not profils_queries:
+    #     raise HTTPException(status_code=404, detail="profils not found")
                         
     return jsonable_encoder(profils_queries)
 

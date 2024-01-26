@@ -65,9 +65,8 @@ async def read_stories_actif(skip: int = 0, limit: int = 100, db: Session = Depe
     stories_queries = db.query(models.Story).filter(models.Story.active == "True").order_by(models.Story.created_at).offset(skip).limit(limit).all()
     
     # pas de storie
-    if not stories_queries:
-       
-        raise HTTPException(status_code=404, detail="storie not found")
+    # if not stories_queries:
+    #     raise HTTPException(status_code=404, detail="storie not found")
     
     return jsonable_encoder(stories_queries)
 
@@ -183,9 +182,8 @@ async def read_stories_inactive(skip: int = 0, limit: int = 100, db: Session = D
     stories_queries = db.query(models.Story).filter(models.Story.active == "False").order_by(models.Story.created_at).offset(skip).limit(limit).all()
     
     # pas de storie
-    if not stories_queries:
-       
-        raise HTTPException(status_code=404, detail="stories not found")
+    # if not stories_queries:
+    #     raise HTTPException(status_code=404, detail="stories not found")
                         
     return jsonable_encoder(stories_queries)
 

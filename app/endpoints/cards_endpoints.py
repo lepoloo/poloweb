@@ -55,9 +55,8 @@ async def read_Cards_actif(skip: int = 0, limit: int = 100, db: Session = Depend
     cards_queries = db.query(models.Card).filter(models.Card.active == "True").order_by(models.Card.name).offset(skip).limit(limit).all()
     
     # pas de Card
-    if not cards_queries:
-       
-        raise HTTPException(status_code=404, detail="Card not found")
+    # if not cards_queries:
+    #     raise HTTPException(status_code=404, detail="Card not found")
                         
     return jsonable_encoder(cards_queries)
 
@@ -166,9 +165,8 @@ async def read_Cards_inactive(skip: int = 0, limit: int = 100, db: Session = Dep
     cards_queries = db.query(models.Card).filter(models.Card.active == "False").order_by(models.Card.name).offset(skip).limit(limit).all()
     
     # pas de Card
-    if not cards_queries:
-       
-        raise HTTPException(status_code=404, detail="Cards not found")
+    # if not cards_queries:
+    #     raise HTTPException(status_code=404, detail="Cards not found")
                         
     return jsonable_encoder(cards_queries)
 

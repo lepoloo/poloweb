@@ -55,9 +55,8 @@ async def read_category_site_actif(skip: int = 0, limit: int = 100, db: Session 
     category_sites_queries = db.query(models.CategorySite).filter(models.CategorySite.active == "True").order_by(models.CategorySite.name).offset(skip).limit(limit).all()
     
     # pas de category_site
-    if not category_sites_queries:
-       
-        raise HTTPException(status_code=404, detail="category_site not found")
+    # if not category_sites_queries:
+    #     raise HTTPException(status_code=404, detail="category_site not found")
                         
     return jsonable_encoder(category_sites_queries)
 
@@ -153,9 +152,8 @@ async def read_category_sites_inactive(skip: int = 0, limit: int = 100, db: Sess
     category_sites_queries = db.query(models.CategorySite).filter(models.CategorySite.active == "False").order_by(models.CategorySite.name).offset(skip).limit(limit).all()
     
     # pas de category_site
-    if not category_sites_queries:
-       
-        raise HTTPException(status_code=404, detail="category_sites not found")
+    # if not category_sites_queries:
+    #     raise HTTPException(status_code=404, detail="category_sites not found")
                         
     return jsonable_encoder(category_sites_queries)
 

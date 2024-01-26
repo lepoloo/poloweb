@@ -67,9 +67,8 @@ async def read_reels_actif(skip: int = 0, limit: int = 100, db: Session = Depend
     reels_queries = db.query(models.Reel).filter(models.Reel.active == "True").order_by(models.Reel.created_at).offset(skip).limit(limit).all()
     
     # pas de reel
-    if not reels_queries:
-       
-        raise HTTPException(status_code=404, detail="reel not found")
+    # if not reels_queries:
+    #     raise HTTPException(status_code=404, detail="reel not found")
                         
     return jsonable_encoder(reels_queries)
 
@@ -185,9 +184,8 @@ async def read_reels_inactive(skip: int = 0, limit: int = 100, db: Session = Dep
     reels_queries = db.query(models.Reel).filter(models.Reel.active == "False").order_by(models.Reel.created_at).offset(skip).limit(limit).all()
     
     # pas de reel
-    if not reels_queries:
-       
-        raise HTTPException(status_code=404, detail="reels not found")
+    # if not reels_queries:
+    #     raise HTTPException(status_code=404, detail="reels not found")
                         
     return jsonable_encoder(reels_queries)
 

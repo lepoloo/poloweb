@@ -58,9 +58,8 @@ async def read_schedule_time_actif(skip: int = 0, limit: int = 100, db: Session 
     schedule_times_queries = db.query(models.ScheduleTime).filter(models.ScheduleTime.active == "True").order_by(models.ScheduleTime.program_id).offset(skip).limit(limit).all()
     
     # pas de schedule_time
-    if not schedule_times_queries:
-       
-        raise HTTPException(status_code=404, detail="schedule_time not found")
+    # if not schedule_times_queries:
+    #     raise HTTPException(status_code=404, detail="schedule_time not found")
                         
     return jsonable_encoder(schedule_times_queries)
 
@@ -159,9 +158,8 @@ async def read_schedule_times_inactive(skip: int = 0, limit: int = 100, db: Sess
     schedule_times_queries = db.query(models.ScheduleTime).filter(models.ScheduleTime.active == "False", ).order_by(models.ScheduleTime.program_id).offset(skip).limit(limit).all()
     
     # pas de schedule_time
-    if not schedule_times_queries:
-       
-        raise HTTPException(status_code=404, detail="schedule_times not found")
+    # if not schedule_times_queries:
+    #     raise HTTPException(status_code=404, detail="schedule_times not found")
                         
     return jsonable_encoder(schedule_times_queries)
 

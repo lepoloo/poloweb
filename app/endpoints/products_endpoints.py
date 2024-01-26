@@ -56,9 +56,8 @@ async def read_products_actif(skip: int = 0, limit: int = 100, db: Session = Dep
     products_queries = db.query(models.Product).filter(models.Product.active == "True").order_by(models.Product.name).offset(skip).limit(limit).all()
     
     # pas de product
-    if not products_queries:
-       
-        raise HTTPException(status_code=404, detail="product not found")
+    # if not products_queries:
+    #     raise HTTPException(status_code=404, detail="product not found")
                         
     return jsonable_encoder(products_queries)
 
@@ -166,9 +165,8 @@ async def read_products_inactive(skip: int = 0, limit: int = 100, db: Session = 
     products_queries = db.query(models.Product).filter(models.Product.active == "False", ).order_by(models.Product.name).offset(skip).limit(limit).all()
     
     # pas de product
-    if not products_queries:
-       
-        raise HTTPException(status_code=404, detail="products not found")
+    # if not products_queries:
+    #     raise HTTPException(status_code=404, detail="products not found")
                         
     return jsonable_encoder(products_queries)
 

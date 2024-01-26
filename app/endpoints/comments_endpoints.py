@@ -52,9 +52,8 @@ async def read_comments_actif(skip: int = 0, limit: int = 100, db: Session = Dep
     comments_queries = db.query(models.Comment).filter(models.Comment.active == "True").order_by(models.Comment.created_at).offset(skip).limit(limit).all()
     
     # pas de comment
-    if not comments_queries:
-       
-        raise HTTPException(status_code=404, detail="comment not found")
+    # if not comments_queries:
+    #     raise HTTPException(status_code=404, detail="comment not found")
                         
     return jsonable_encoder(comments_queries)
 
@@ -153,9 +152,8 @@ async def read_comments_inactive(skip: int = 0, limit: int = 100, db: Session = 
     comments_queries = db.query(models.Comment).filter(models.Comment.active == "False", ).order_by(models.Comment.created_at).offset(skip).limit(limit).all()
     
     # pas de comment
-    if not comments_queries:
-       
-        raise HTTPException(status_code=404, detail="comments not found")
+    # if not comments_queries:
+    #     raise HTTPException(status_code=404, detail="comments not found")
                         
     return jsonable_encoder(comments_queries)
 

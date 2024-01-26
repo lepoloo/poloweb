@@ -57,9 +57,8 @@ async def read_programs_actif(skip: int = 0, limit: int = 100, db: Session = Dep
     programs_queries = db.query(models.Program).filter(models.Program.active == "True").order_by(models.Program.name).offset(skip).limit(limit).all()
     
     # pas de program
-    if not programs_queries:
-       
-        raise HTTPException(status_code=404, detail="program not found")
+    # if not programs_queries:
+    #     raise HTTPException(status_code=404, detail="program not found")
                         
     return jsonable_encoder(programs_queries)
 
@@ -162,9 +161,8 @@ async def read_programs_inactive(skip: int = 0, limit: int = 100, db: Session = 
     programs_queries = db.query(models.Program).filter(models.Program.active == "False", ).order_by(models.Program.name).offset(skip).limit(limit).all()
     
     # pas de program
-    if not programs_queries:
-       
-        raise HTTPException(status_code=404, detail="programs not found")
+    # if not programs_queries:
+    #     raise HTTPException(status_code=404, detail="programs not found")
                         
     return jsonable_encoder(programs_queries)
 

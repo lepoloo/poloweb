@@ -55,9 +55,8 @@ async def read_profil_roles_actif(skip: int = 0, limit: int = 100, db: Session =
     profil_roles_queries = db.query(models.ProfilRole).filter(models.ProfilRole.active == "True").order_by(models.ProfilRole.created_at).offset(skip).limit(limit).all()
     
     # pas de profil_role
-    if not profil_roles_queries:
-       
-        raise HTTPException(status_code=404, detail="profil_role not found")
+    # if not profil_roles_queries:
+    #     raise HTTPException(status_code=404, detail="profil_role not found")
                         
     return jsonable_encoder(profil_roles_queries)
 
@@ -146,8 +145,8 @@ async def read_profil_roles_inactive(skip: int = 0, limit: int = 100, db: Sessio
     profil_roles_queries = db.query(models.ProfilRole).filter(models.ProfilRole.active == "False").order_by(models.ProfilRole.created_at).offset(skip).limit(limit).all()
     
     # pas de profil_role
-    if not profil_roles_queries:
-        raise HTTPException(status_code=404, detail="profil_roles not found")
+    # if not profil_roles_queries:
+    #     raise HTTPException(status_code=404, detail="profil_roles not found")
                         
     return jsonable_encoder(profil_roles_queries)
 

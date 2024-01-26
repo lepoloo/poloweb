@@ -56,9 +56,8 @@ async def read_events_actif(skip: int = 0, limit: int = 100, db: Session = Depen
     events_queries = db.query(models.Event).filter(models.Event.active == "True").order_by(models.Event.name).offset(skip).limit(limit).all()
     
     # pas de event
-    if not events_queries:
-       
-        raise HTTPException(status_code=404, detail="event not found")
+    # if not events_queries:
+    #     raise HTTPException(status_code=404, detail="event not found")
                         
     return jsonable_encoder(events_queries)
 
@@ -196,8 +195,8 @@ async def read_events_inactive(skip: int = 0, limit: int = 100, db: Session = De
     events_queries = db.query(models.Event).filter(models.Event.active == "False").order_by(models.Event.name).offset(skip).limit(limit).all()
     
     # pas de event
-    if not events_queries:
-        raise HTTPException(status_code=404, detail="events not found")
+    # if not events_queries:
+    #     raise HTTPException(status_code=404, detail="events not found")
                         
     return jsonable_encoder(events_queries)
 

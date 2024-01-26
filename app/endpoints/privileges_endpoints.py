@@ -56,9 +56,8 @@ async def read_privilege_actif(skip: int = 0, limit: int = 100, db: Session = De
     privileges_queries = db.query(models.Privilege).filter(models.Privilege.active == "True").order_by(models.Privilege.name).offset(skip).limit(limit).all()
     
     # pas de privilege
-    if not privileges_queries:
-       
-        raise HTTPException(status_code=404, detail="privilege not found")
+    # if not privileges_queries:
+    #     raise HTTPException(status_code=404, detail="privilege not found")
                         
     return jsonable_encoder(privileges_queries)
 
@@ -158,9 +157,8 @@ async def read_privileges_inactive(skip: int = 0, limit: int = 100, db: Session 
     privileges_queries = db.query(models.Privilege).filter(models.Privilege.active == "False").order_by(models.Privilege.name).offset(skip).limit(limit).all()
     
     # pas de privilege
-    if not privileges_queries:
-       
-        raise HTTPException(status_code=404, detail="privileges not found")
+    # if not privileges_queries:
+    #     raise HTTPException(status_code=404, detail="privileges not found")
                         
     return jsonable_encoder(privileges_queries)
 

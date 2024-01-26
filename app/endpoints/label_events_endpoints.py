@@ -56,9 +56,8 @@ async def read_label_event_actif(skip: int = 0, limit: int = 100, db: Session = 
     label_events_queries = db.query(models.LabelEvent).filter(models.LabelEvent.active == "True").order_by(models.LabelEvent.name).offset(skip).limit(limit).all()
     
     # pas de label_event
-    if not label_events_queries:
-       
-        raise HTTPException(status_code=404, detail="Type product not found")
+    # if not label_events_queries:
+    #     raise HTTPException(status_code=404, detail="Type product not found")
                         
     return jsonable_encoder(label_events_queries)
 
@@ -154,9 +153,8 @@ async def read_label_events_inactive(skip: int = 0, limit: int = 100, db: Sessio
     label_events_queries = db.query(models.LabelEvent).filter(models.LabelEvent.active == "False").order_by(models.LabelEvent.name).offset(skip).limit(limit).all()
     
     # pas de label_event
-    if not label_events_queries:
-       
-        raise HTTPException(status_code=404, detail="label_events not found")
+    # if not label_events_queries:
+    #     raise HTTPException(status_code=404, detail="label_events not found")
                         
     return jsonable_encoder(label_events_queries)
 

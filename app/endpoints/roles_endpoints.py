@@ -55,9 +55,8 @@ async def read_role_actif(skip: int = 0, limit: int = 100, db: Session = Depends
     roles_queries = db.query(models.Role).filter(models.Role.active == "True").order_by(models.Role.name).offset(skip).limit(limit).all()
     
     # pas de role
-    if not roles_queries:
-       
-        raise HTTPException(status_code=404, detail="Role not found")
+    # if not roles_queries:
+    #     raise HTTPException(status_code=404, detail="Role not found")
                         
     return jsonable_encoder(roles_queries)
 
@@ -157,9 +156,8 @@ async def read_roles_inactive(skip: int = 0, limit: int = 100, db: Session = Dep
     roles_queries = db.query(models.Role).filter(models.Role.active == "False").order_by(models.Role.name).offset(skip).limit(limit).all()
     
     # pas de role
-    if not roles_queries:
-       
-        raise HTTPException(status_code=404, detail="roles not found")
+    # if not roles_queries:
+    #     raise HTTPException(status_code=404, detail="roles not found")
                         
     return jsonable_encoder(roles_queries)
 

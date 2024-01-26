@@ -52,9 +52,8 @@ async def read_entertainment_site_multimedias_actif(skip: int = 0, limit: int = 
     entertainment_site_multimedias_queries = db.query(models.EntertainmentSiteMultimedia).filter(models.EntertainmentSiteMultimedia.active == "True").order_by(models.EntertainmentSiteMultimedia.created_at).offset(skip).limit(limit).all()
     
     # pas de entertainment_site_multimedia
-    if not entertainment_site_multimedias_queries:
-       
-        raise HTTPException(status_code=404, detail="entertainment_site_multimedia not found")
+    # if not entertainment_site_multimedias_queries:
+    #     raise HTTPException(status_code=404, detail="entertainment_site_multimedia not found")
                         
     return jsonable_encoder(entertainment_site_multimedias_queries)
 
@@ -144,8 +143,8 @@ async def read_entertainment_site_multimedias_inactive(skip: int = 0, limit: int
     entertainment_site_multimedias_queries = db.query(models.EntertainmentSiteMultimedia).filter(models.EntertainmentSiteMultimedia.active == "False").order_by(models.EntertainmentSiteMultimedia.created_at).offset(skip).limit(limit).all()
     
     # pas de entertainment_site_multimedia
-    if not entertainment_site_multimedias_queries:
-        raise HTTPException(status_code=404, detail="entertainment_site_multimedias not found")
+    # if not entertainment_site_multimedias_queries:
+    #     raise HTTPException(status_code=404, detail="entertainment_site_multimedias not found")
                         
     return jsonable_encoder(entertainment_site_multimedias_queries)
 

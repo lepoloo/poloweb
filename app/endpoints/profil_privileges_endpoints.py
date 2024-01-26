@@ -54,9 +54,8 @@ async def read_profil_privileges_actif(skip: int = 0, limit: int = 100, db: Sess
     profil_privileges_queries = db.query(models.ProfilPrivilege).filter(models.ProfilPrivilege.active == "True").order_by(models.ProfilPrivilege.created_at).offset(skip).limit(limit).all()
     
     # pas de profil_privilege
-    if not profil_privileges_queries:
-       
-        raise HTTPException(status_code=404, detail="profil_privilege not found")
+    # if not profil_privileges_queries:
+    #     raise HTTPException(status_code=404, detail="profil_privilege not found")
                         
     return jsonable_encoder(profil_privileges_queries)
 
@@ -144,8 +143,8 @@ async def read_profil_privileges_inactive(skip: int = 0, limit: int = 100, db: S
     profil_privileges_queries = db.query(models.ProfilPrivilege).filter(models.ProfilPrivilege.active == "False").order_by(models.ProfilPrivilege.created_at).offset(skip).limit(limit).all()
     
     # pas de profil_privilege
-    if not profil_privileges_queries:
-        raise HTTPException(status_code=404, detail="profil_privileges not found")
+    # if not profil_privileges_queries:
+    #     raise HTTPException(status_code=404, detail="profil_privileges not found")
                         
     return jsonable_encoder(profil_privileges_queries)
 

@@ -58,9 +58,8 @@ async def read_category_entertainment_sites_actif(skip: int = 0, limit: int = 10
     category_entertainment_sites_queries = db.query(models.CategoryEntertainmentSite).filter(models.CategoryEntertainmentSite.active == "True").order_by(models.CategoryEntertainmentSite.entertainment_site_id).offset(skip).limit(limit).all()
     
     # pas de category_entertainment_site
-    if not category_entertainment_sites_queries:
-       
-        raise HTTPException(status_code=404, detail="category_entertainment_site not found")
+    # if not category_entertainment_sites_queries:
+    #     raise HTTPException(status_code=404, detail="category_entertainment_site not found")
                         
     return jsonable_encoder(category_entertainment_sites_queries)
 
@@ -154,8 +153,8 @@ async def read_category_entertainment_sites_inactive(skip: int = 0, limit: int =
     category_entertainment_sites_queries = db.query(models.CategoryEntertainmentSite).filter(models.CategoryEntertainmentSite.active == "False").order_by(models.CategoryEntertainmentSite.entertainment_site_id).offset(skip).limit(limit).all()
     
     # pas de category_entertainment_site
-    if not category_entertainment_sites_queries:
-        raise HTTPException(status_code=404, detail="category_entertainment_sites not found")
+    # if not category_entertainment_sites_queries:
+    #     raise HTTPException(status_code=404, detail="category_entertainment_sites not found")
                         
     return jsonable_encoder(category_entertainment_sites_queries)
 

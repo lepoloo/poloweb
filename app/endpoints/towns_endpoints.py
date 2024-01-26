@@ -56,9 +56,8 @@ async def read_towns_actif(skip: int = 0, limit: int = 100, db: Session = Depend
     towns_queries = db.query(models.Town).filter(models.Town.active == "True").order_by(models.Town.name).join(models.Country).filter(models.Country.id == models.Town.country_id).group_by(models.Town.id).limit(limit).offset(skip).all()
     
     # pas de town
-    if not towns_queries:
-       
-        raise HTTPException(status_code=404, detail="town not found")
+    # if not towns_queries:
+    #     raise HTTPException(status_code=404, detail="town not found")
                         
     return jsonable_encoder(towns_queries)
 
@@ -157,9 +156,8 @@ async def read_towns_inactive(skip: int = 0, limit: int = 100, db: Session = Dep
     towns_queries = db.query(models.Town).filter(models.Town.active == "False").order_by(models.Town.name).offset(skip).limit(limit).all()
     
     # pas de town
-    if not towns_queries:
-       
-        raise HTTPException(status_code=404, detail="towns not found")
+    # if not towns_queries:
+    #     raise HTTPException(status_code=404, detail="towns not found")
                         
     return jsonable_encoder(towns_queries)
 

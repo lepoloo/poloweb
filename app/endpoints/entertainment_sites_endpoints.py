@@ -61,9 +61,8 @@ async def read_entertainment_sites_actif(skip: int = 0, limit: int = 100, db: Se
     entertainment_sites_queries = db.query(models.EntertainmentSite).filter(models.EntertainmentSite.active == "True").order_by(models.EntertainmentSite.name).offset(skip).limit(limit).all()
     # print(entertainment_sites_queries.__dict__)
     # pas de entertainment_site
-    if not entertainment_sites_queries:
-       
-        raise HTTPException(status_code=404, detail="entertainment_site not found")
+    # if not entertainment_sites_queries:
+    #     raise HTTPException(status_code=404, detail="entertainment_site not found")
     
                        
     return jsonable_encoder(entertainment_sites_queries)
@@ -243,9 +242,8 @@ async def read_entertainment_sites_inactive(skip: int = 0, limit: int = 100, db:
     entertainment_sites_queries = db.query(models.EntertainmentSite).filter(models.EntertainmentSite.active == "False").order_by(models.EntertainmentSite.created_at).offset(skip).limit(limit).all()
     
     # pas de entertainment_site
-    if not entertainment_sites_queries:
-       
-        raise HTTPException(status_code=404, detail="entertainment_sites not found")
+    # if not entertainment_sites_queries:
+    #     raise HTTPException(status_code=404, detail="entertainment_sites not found")
                         
     return jsonable_encoder(entertainment_sites_queries)
 

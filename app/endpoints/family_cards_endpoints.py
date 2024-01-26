@@ -56,9 +56,8 @@ async def read_family_card_actif(skip: int = 0, limit: int = 100, db: Session = 
     family_cards_queries = db.query(models.FamilyCard).filter(models.FamilyCard.active == "True").order_by(models.FamilyCard.name).offset(skip).limit(limit).all()
     
     # pas de family_card
-    if not family_cards_queries:
-       
-        raise HTTPException(status_code=404, detail="family_card not found")
+    # if not family_cards_queries:
+    #     raise HTTPException(status_code=404, detail="family_card not found")
                         
     return jsonable_encoder(family_cards_queries)
 
@@ -155,9 +154,8 @@ async def read_family_cards_inactive(skip: int = 0, limit: int = 100, db: Sessio
     family_cards_queries = db.query(models.FamilyCard).filter(models.FamilyCard.active == "False").order_by(models.FamilyCard.name).offset(skip).limit(limit).all()
     
     # pas de family_card
-    if not family_cards_queries:
-       
-        raise HTTPException(status_code=404, detail="family_cards not found")
+    # if not family_cards_queries:
+    #     raise HTTPException(status_code=404, detail="family_cards not found")
                         
     return jsonable_encoder(family_cards_queries)
 

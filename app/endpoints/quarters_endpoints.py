@@ -54,9 +54,8 @@ async def read_quarters_actif(skip: int = 0, limit: int = 100, db: Session = Dep
     quarters_queries = db.query(models.Quarter).filter(models.Quarter.active == "True").order_by(models.Quarter.name).offset(skip).limit(limit).all()
     
     # pas de quarter
-    if not quarters_queries:
-       
-        raise HTTPException(status_code=404, detail="Quarter not found")
+    # if not quarters_queries:
+    #     raise HTTPException(status_code=404, detail="Quarter not found")
                         
     return jsonable_encoder(quarters_queries)
 
@@ -155,9 +154,8 @@ async def read_quarters_inactive(skip: int = 0, limit: int = 100, db: Session = 
     quarters_queries = db.query(models.Quarter).filter(models.Quarter.active == "False", ).order_by(models.Quarter.name).offset(skip).limit(limit).all()
     
     # pas de quarter
-    if not quarters_queries:
-       
-        raise HTTPException(status_code=404, detail="quarters not found")
+    # if not quarters_queries:
+    #     raise HTTPException(status_code=404, detail="quarters not found")
                         
     return jsonable_encoder(quarters_queries)
 

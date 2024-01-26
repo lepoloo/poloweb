@@ -67,9 +67,8 @@ async def read_users_actif(skip: int = 0, limit: int = 100, db: Session = Depend
     print(users_queries)
     
     # pas de user
-    if not users_queries:
-       
-        raise HTTPException(status_code=404, detail="User not found")
+    # if not users_queries:
+    #     raise HTTPException(status_code=404, detail="User not found")
                         
     return jsonable_encoder(users_queries)
 
@@ -227,9 +226,8 @@ async def read_users_inactive(skip: int = 0, limit: int = 100, db: Session = Dep
     users_queries = db.query(models.User).filter(models.User.active == "False").order_by(models.User.name).offset(skip).limit(limit).all()
     
     # pas de user
-    if not users_queries:
-       
-        raise HTTPException(status_code=404, detail="Users not found")
+    # if not users_queries:
+    #     raise HTTPException(status_code=404, detail="Users not found")
                         
     return jsonable_encoder(users_queries)
 

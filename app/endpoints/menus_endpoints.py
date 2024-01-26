@@ -56,9 +56,8 @@ async def read_menus_actif(skip: int = 0, limit: int = 100, db: Session = Depend
     menus_queries = db.query(models.Menu).filter(models.Menu.active == "True").order_by(models.Menu.card_id).offset(skip).limit(limit).all()
     
     # pas de menu
-    if not menus_queries:
-       
-        raise HTTPException(status_code=404, detail="menu not found")
+    # if not menus_queries:
+    #     raise HTTPException(status_code=404, detail="menu not found")
                         
     return jsonable_encoder(menus_queries)
 
@@ -152,8 +151,8 @@ async def read_menus_inactive(skip: int = 0, limit: int = 100, db: Session = Dep
     menus_queries = db.query(models.Menu).filter(models.Menu.active == "False").order_by(models.Menu.card_id).offset(skip).limit(limit).all()
     
     # pas de menu
-    if not menus_queries:
-        raise HTTPException(status_code=404, detail="menus not found")
+    # if not menus_queries:
+    #     raise HTTPException(status_code=404, detail="menus not found")
                         
     return jsonable_encoder(menus_queries)
 

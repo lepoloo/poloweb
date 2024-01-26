@@ -54,9 +54,8 @@ async def read_event_multimedias_actif(skip: int = 0, limit: int = 100, db: Sess
     event_multimedias_queries = db.query(models.EventMultimedia).filter(models.EventMultimedia.active == "True").order_by(models.EventMultimedia.created_at).offset(skip).limit(limit).all()
     
     # pas de event_multimedia
-    if not event_multimedias_queries:
-       
-        raise HTTPException(status_code=404, detail="event_multimedia not found")
+    # if not event_multimedias_queries:
+    #     raise HTTPException(status_code=404, detail="event_multimedia not found")
                         
     return jsonable_encoder(event_multimedias_queries)
 
@@ -146,8 +145,8 @@ async def read_event_multimedias_inactive(skip: int = 0, limit: int = 100, db: S
     event_multimedias_queries = db.query(models.EventMultimedia).filter(models.EventMultimedia.active == "False", ).offset(skip).limit(limit).all()
     
     # pas de event_multimedia
-    if not event_multimedias_queries:
-        raise HTTPException(status_code=404, detail="event_multimedias not found")
+    # if not event_multimedias_queries:
+    #     raise HTTPException(status_code=404, detail="event_multimedias not found")
                         
     return jsonable_encoder(event_multimedias_queries)
 

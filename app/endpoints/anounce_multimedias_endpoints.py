@@ -52,9 +52,9 @@ async def read_anounce_multimedias_actif(skip: int = 0, limit: int = 100, db: Se
     anounce_multimedias_queries = db.query(models.AnounceMultimedia).filter(models.AnounceMultimedia.active == "True").order_by(models.AnounceMultimedia.link_media).offset(skip).limit(limit).all()
     
     # pas de anounce_multimedia
-    if not anounce_multimedias_queries:
-       
-        raise HTTPException(status_code=404, detail="anounce_multimedia not found")
+    # if not anounce_multimedias_queries:
+
+    #     raise HTTPException(status_code=404, detail="anounce_multimedia not found")
                         
     return jsonable_encoder(anounce_multimedias_queries)
 
@@ -147,8 +147,8 @@ async def read_anounce_multimedias_inactive(skip: int = 0, limit: int = 100, db:
     anounce_multimedias_queries = db.query(models.AnounceMultimedia).filter(models.AnounceMultimedia.active == "False", ).order_by(models.AnounceMultimedia.link_media).offset(skip).limit(limit).all()
     
     # pas de anounce_multimedia
-    if not anounce_multimedias_queries:
-        raise HTTPException(status_code=404, detail="anounce_multimedias not found")
+    # if not anounce_multimedias_queries:
+    #     raise HTTPException(status_code=404, detail="anounce_multimedias not found")
                         
     return jsonable_encoder(anounce_multimedias_queries)
 

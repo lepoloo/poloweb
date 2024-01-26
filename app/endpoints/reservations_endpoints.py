@@ -56,9 +56,8 @@ async def read_reservations_actif(skip: int = 0, limit: int = 100, db: Session =
     reservations_queries = db.query(models.Reservation).filter(models.Reservation.active == "True").order_by(models.Reservation.created_at).offset(skip).limit(limit).all()
     
     # pas de reservation
-    if not reservations_queries:
-       
-        raise HTTPException(status_code=404, detail="reservation not found")
+    # if not reservations_queries:
+    #     raise HTTPException(status_code=404, detail="reservation not found")
                         
     return jsonable_encoder(reservations_queries)
 
@@ -162,9 +161,8 @@ async def read_reservations_inactive(skip: int = 0, limit: int = 100, db: Sessio
     reservations_queries = db.query(models.Reservation).filter(models.Reservation.active == "False", ).order_by(models.Reservation.created_at).offset(skip).limit(limit).all()
     
     # pas de reservation
-    if not reservations_queries:
-       
-        raise HTTPException(status_code=404, detail="reservations not found")
+    # if not reservations_queries:
+    #     raise HTTPException(status_code=404, detail="reservations not found")
                         
     return jsonable_encoder(reservations_queries)
 

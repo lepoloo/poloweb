@@ -24,9 +24,7 @@ router = APIRouter(prefix = "/note", tags=['notes Requests'])
 @router.post("/create/", status_code = status.HTTP_201_CREATED)
 async def create_note(new_note_c: notes_schemas.NoteCreate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     notes_queries = db.query(models.Note).filter(models.Note.entertainment_site_id == new_note_c.entertainment_site_id,models.Note.owner_id == new_note_c.owner_id ).first()
-    # print(notes_queries.__dict__)
-    # print(new_note_c)
-    # input("entrer un nombre")
+    
     if notes_queries:
         notes_queries.note = new_note_c.note
         try:
@@ -67,9 +65,8 @@ async def read_notes_actif(skip: int = 0, limit: int = 100, db: Session = Depend
     notes_queries = db.query(models.Note).filter(models.Note.active == "True").order_by(models.Note.entertainment_site_id).offset(skip).limit(limit).all()
     
     # pas de note
-    if not notes_queries:
-       
-        raise HTTPException(status_code=404, detail="note not found")
+    # if not notes_queries:
+    #     raise HTTPException(status_code=404, detail="note not found")
                         
     return jsonable_encoder(notes_queries)
 

@@ -61,9 +61,8 @@ async def read_favorites_actif(skip: int = 0, limit: int = 100, db: Session = De
     favorites_queries = db.query(models.Favorite).filter(models.Favorite.active == "True").order_by(models.Favorite.created_at).offset(skip).limit(limit).all()
     
     # pas de favorite
-    if not favorites_queries:
-       
-        raise HTTPException(status_code=404, detail="favorite not found")
+    # if not favorites_queries:
+    #     raise HTTPException(status_code=404, detail="favorite not found")
                         
     return jsonable_encoder(favorites_queries)
 

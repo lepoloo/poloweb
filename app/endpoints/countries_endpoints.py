@@ -55,9 +55,8 @@ async def read_countrys_actif(skip: int = 0, limit: int = 100, db: Session = Dep
     countries_queries = db.query(models.Country).filter(models.Country.active == "True").order_by(models.Country.name).offset(skip).limit(limit).all()
     
     # pas de country
-    if not countries_queries:
-       
-        raise HTTPException(status_code=404, detail="country not found")
+    # if not countries_queries:
+    #     raise HTTPException(status_code=404, detail="country not found")
                         
     return jsonable_encoder(countries_queries)
 
@@ -152,9 +151,8 @@ async def read_countrys_inactive(skip: int = 0, limit: int = 100, db: Session = 
     countries_queries = db.query(models.Country).filter(models.Country.active == "False").order_by(models.Country.name).offset(skip).limit(limit).all()
     
     # pas de country
-    if not countries_queries:
-       
-        raise HTTPException(status_code=404, detail="countrys not found")
+    # if not countries_queries:
+    #     raise HTTPException(status_code=404, detail="countrys not found")
                         
     return jsonable_encoder(countries_queries)
 
