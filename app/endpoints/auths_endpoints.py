@@ -110,9 +110,11 @@ def get_privileges_for_user_profil(
         profile_privileges.extend(role_privileges)
 
     # Supprimer les doublons
-    unique_privileges = list(set(profile_privileges))
+    privileges = list(set(profile_privileges))
+    
+    
 
-    return {"profil_id": profil.id, "privileges": unique_privileges}
+    return {"profil_id": profil_id, "privileges": privileges}
     
     
 # Endpoint de déconnexion

@@ -26,14 +26,18 @@ router = APIRouter(prefix = "/user", tags=['Users Requests'])
 # async def create_user(new_user_c: users_schemas.UserCreate, file: UploadFile = File(...), db: Session = Depends(get_db)):
 async def create_user(new_user_c: users_schemas.UserCreate, db: Session = Depends(get_db)):
     # Vérifiez si l'utilisateur existe déjà dans la base de données
-    if db.query(models.User).filter(models.User.username == new_user_c.username).first():
-        raise HTTPException(status_code=400, detail='Registered user with this username')
-    if db.query(models.User).filter(models.User.phone == new_user_c.phone).first():
-        raise HTTPException(status_code=400, detail='Registered user with this phone number')
-    if db.query(models.User).filter(models.User.email == new_user_c.email).first():
-        raise HTTPException(status_code=400, detail='Registered user with this email')
-    if db.query(models.User).filter(models.User.image == new_user_c.image).first():
-        raise HTTPException(status_code=400, detail='Registered user with this image')
+    if new_user_c.username:
+        if db.query(models.User).filter(models.User.username == new_user_c.username).first():
+            raise HTTPException(status_code=400, detail='Registered user with this username')
+    if new_user_c.phone:
+        if db.query(models.User).filter(models.User.phone == new_user_c.phone).first():
+            raise HTTPException(status_code=400, detail='Registered user with this phone number')
+    if new_user_c.email:
+        if db.query(models.User).filter(models.User.email == new_user_c.email).first():
+            raise HTTPException(status_code=400, detail='Registered user with this email')
+    if new_user_c.image:
+        if db.query(models.User).filter(models.User.image == new_user_c.image).first():
+            raise HTTPException(status_code=400, detail='Registered user with this image')
     
     formated_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")# Formatage de la date au format souhaité (par exemple, YYYY-MM-DD HH:MM:SS)
     concatenated_uuid = str(uuid.uuid4())+ ":" + formated_date
@@ -146,7 +150,7 @@ async def detail_user(user_id: str, db: Session = Depends(get_db)):
 
 
 
-# update an permission request
+# update an user request
 @router.put("/update/{user_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = users_schemas.UserDetail)
 async def update_user(user_id: str, user_update: users_schemas.UserUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         

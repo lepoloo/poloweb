@@ -13,17 +13,17 @@ from app.schemas.entertainment_sites_schemas import EntertainmentSiteListing
 from app.models.models import GenderType
 
 class User(BaseModel):
-    name: str
-    surname: str
-    phone: str
-    email: EmailStr
-    birthday: date
-    gender: GenderType
+    name: Optional[str] = None
+    surname: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[EmailStr] = None
+    birthday: Optional[date] = None
+    gender: Optional[GenderType] = None
     username: str
     
 
 class UserCreate(User):
-   image: str
+   image: Optional[str] = None
    password: str
    is_staff: bool = False
    is_owner: bool = False
