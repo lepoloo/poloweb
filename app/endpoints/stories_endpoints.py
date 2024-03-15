@@ -64,10 +64,6 @@ async def read_stories_actif(skip: int = 0, limit: int = 100, db: Session = Depe
     
     stories_queries = db.query(models.Story).filter(models.Story.active == "True").order_by(models.Story.created_at).offset(skip).limit(limit).all()
     
-    # pas de storie
-    # if not stories_queries:
-    #     raise HTTPException(status_code=404, detail="storie not found")
-    
     return jsonable_encoder(stories_queries)
 
 
@@ -86,9 +82,6 @@ async def detail_storie_by_attribute(refnumber: Optional[str] = None, owner_id: 
     if description is not None:
         storie_query = db.query(models.Story).filter(models.Story.description.contains(description), models.Story.active == "True").order_by(models.Story.created_at).offset(skip).limit(limit).all()
     
-    
-    if not storie_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"storie does not exist")
     return jsonable_encoder(storie_query)
 
 # Get an storie
@@ -119,13 +112,11 @@ async def detail_storie(storie_id: str, db: Session = Depends(get_db)):
 
 
 
-
-
 # update an storie request
-@router.put("/update/{storie_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = stories_schemas.StoryDetail)
+@router.put("/update/{storie_id}", status_code = status.HTTP_200_OK, response_model = stories_schemas.StoryDetail)
 async def update_storie(storie_id: str, storie_update: stories_schemas.StoryUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    storie_query = db.query(models.Story).filter(models.Story.id == storie_id, models.Story.active == "True").first()
+    storie_query = db.query(models.Story).filter(models.Story.id == storie_id).first()
 
     if not storie_query:
             
@@ -148,7 +139,17 @@ async def update_storie(storie_id: str, storie_update: stories_schemas.StoryUpda
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=403, detail="Somthing is wrong in the process , pleace try later sorry!")
-        
+    
+    storie_query = db.query(models.Story).filter(models.Story.id == storie_id).first()
+    
+    likes = storie_query.likes
+    details = [{ 'id': like.id, 'refnumber': like.refnumber, 'owner_id': like.owner_id, 'event_id': like.event_id, 'anounce_id': like.anounce_id, 'reel_id': like.reel_id, 'story_id': like.story_id, 'active': like.active} for like in likes]
+    likes = details
+    
+    signals = storie_query.signals
+    details = [{ 'id': signal.id, 'refnumber': signal.refnumber, 'owner_id': signal.owner_id, 'event_id': signal.event_id, 'anounce_id': signal.anounce_id, 'story_id': signal.story_id, 'story_id': signal.story_id, 'entertainment_site_id': signal.entertainment_site_id, 'active': signal.active} for signal in signals]
+    signals = details    
+    
     return jsonable_encoder(storie_query)
 
 
@@ -180,11 +181,7 @@ async def delete_storie(storie_id: str,  db: Session = Depends(get_db), current_
 async def read_stories_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db),current_user : str = Depends(oauth2.get_current_user)):
     
     stories_queries = db.query(models.Story).filter(models.Story.active == "False").order_by(models.Story.created_at).offset(skip).limit(limit).all()
-    
-    # pas de storie
-    # if not stories_queries:
-    #     raise HTTPException(status_code=404, detail="stories not found")
-                        
+                      
     return jsonable_encoder(stories_queries)
 
 

@@ -53,11 +53,7 @@ async def create_Card(new_card_c: cards_schemas.CardCreate, db: Session = Depend
 async def read_Cards_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     cards_queries = db.query(models.Card).filter(models.Card.active == "True").order_by(models.Card.name).offset(skip).limit(limit).all()
-    
-    # pas de Card
-    # if not cards_queries:
-    #     raise HTTPException(status_code=404, detail="Card not found")
-                        
+                       
     return jsonable_encoder(cards_queries)
 
 
@@ -78,16 +74,13 @@ async def detail_Card_by_attribute(refnumber: Optional[str] = None, family_card_
     if multimedia is not None :
         card_query = db.query(models.Card).filter(models.Card.multimedia == multimedia, models.Card.active == "True").offset(skip).order_by(models.Card.name).limit(limit).all()
     
-    
-    if not card_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Card does not exist")
     return jsonable_encoder(card_query)
 
 # Get an Card
 @router.get("/get/{card_id}", status_code=status.HTTP_200_OK, response_model=cards_schemas.CardDetail)
 async def detail_Card(card_id: str, db: Session = Depends(get_db)):
     
-    card_query = db.query(models.Card).filter(models.Card.id == card_id, models.Card.active == "True").first()
+    card_query = db.query(models.Card).filter(models.Card.id == card_id).first()
     
     if not card_query:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Card with id: {card_id} does not exist")
@@ -103,10 +96,10 @@ async def detail_Card(card_id: str, db: Session = Depends(get_db)):
 
 
 # update an card request
-@router.put("/update/{card_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = cards_schemas.CardDetail)
+@router.put("/update/{card_id}", status_code = status.HTTP_200_OK, response_model = cards_schemas.CardDetail)
 async def update_Card(card_id: str, Card_update: cards_schemas.CardUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    card_query = db.query(models.Card).filter(models.Card.id == card_id, models.Card.active == "True").first()
+    card_query = db.query(models.Card).filter(models.Card.id == card_id).first()
 
     if not card_query:
             
@@ -131,7 +124,11 @@ async def update_Card(card_id: str, Card_update: cards_schemas.CardUpdate, db: S
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=403, detail="Somthing is wrong in the process , pleace try later sorry!")
-        
+    
+    card_query = db.query(models.Card).filter(models.Card.id == card_id).first()
+    menus = card_query.menus
+    details = [{ 'id': menu.id, 'refnumber': menu.refnumber, 'card_id': menu.card_id, 'product_id': menu.product_id, 'price': menu.price, 'active' : menu.active } for menu in menus]
+    menus = details    
     return jsonable_encoder(card_query)
 
 

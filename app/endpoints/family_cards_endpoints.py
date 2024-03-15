@@ -54,18 +54,14 @@ async def create_family_card(new_family_card_c: family_cards_schemas.FamilyCardC
 async def read_family_card_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     family_cards_queries = db.query(models.FamilyCard).filter(models.FamilyCard.active == "True").order_by(models.FamilyCard.name).offset(skip).limit(limit).all()
-    
-    # pas de family_card
-    # if not family_cards_queries:
-    #     raise HTTPException(status_code=404, detail="family_card not found")
-                        
+                       
     return jsonable_encoder(family_cards_queries)
 
 
 # Get an family_card
 @router.get("/get/{family_card_id}", status_code=status.HTTP_200_OK, response_model=family_cards_schemas.FamilyCardDetail)
 async def detail_family_card(family_card_id: str, db: Session = Depends(get_db)):
-    family_card_query = db.query(models.FamilyCard).filter(models.FamilyCard.id == family_card_id, models.FamilyCard.active == "True").first()
+    family_card_query = db.query(models.FamilyCard).filter(models.FamilyCard.id == family_card_id).first()
     if not family_card_query:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"family_card with id: {family_card_id} does not exist")
     
@@ -75,8 +71,6 @@ async def detail_family_card(family_card_id: str, db: Session = Depends(get_db))
         cards = details
         
     return jsonable_encoder(family_card_query)
-
-
 
 
 # Get an family_card
@@ -89,18 +83,15 @@ async def detail_family_card_by_attribute(name: Optional[str] = None, descriptio
     if description is not None :
         family_card_query = db.query(models.FamilyCard).filter(models.FamilyCard.description.contains(description), models.FamilyCard.active == "True").order_by(models.FamilyCard.name).offset(skip).limit(limit).all()
        
-    
-    if not family_card_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"family_card does not exist")
     return jsonable_encoder(family_card_query)
 
 
 
 # update an family card request
-@router.put("/update/{family_card_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = family_cards_schemas.FamilyCardDetail)
+@router.put("/update/{family_card_id}", status_code = status.HTTP_200_OK, response_model = family_cards_schemas.FamilyCardDetail)
 async def update_family_card(family_card_id: str, family_card_update: family_cards_schemas.FamilyCardUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    family_card_query = db.query(models.FamilyCard).filter(models.FamilyCard.id == family_card_id, models.FamilyCard.active == "True").first()
+    family_card_query = db.query(models.FamilyCard).filter(models.FamilyCard.id == family_card_id).first()
 
     if not family_card_query:
             
@@ -120,7 +111,13 @@ async def update_family_card(family_card_id: str, family_card_update: family_car
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=403, detail="Somthing is wrong in the process , pleace try later sorry!")
-        
+    
+    family_card_query = db.query(models.FamilyCard).filter(models.FamilyCard.id == family_card_id).first()
+    cards = family_card_query.cards
+    for card in cards:
+        details = [{ 'id': card.id, 'refnumber': card.refnumber, 'name': card.name, 'family_card_id': card.family_card_id, 'entertainment_site_id': card.entertainment_site_id, 'description': card.description, 'active': card.active} for card in cards]
+        cards = details    
+    
     return jsonable_encoder(family_card_query)
 
 
@@ -152,11 +149,7 @@ async def delete_family_card(family_card_id: str,  db: Session = Depends(get_db)
 async def read_family_cards_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     family_cards_queries = db.query(models.FamilyCard).filter(models.FamilyCard.active == "False").order_by(models.FamilyCard.name).offset(skip).limit(limit).all()
-    
-    # pas de family_card
-    # if not family_cards_queries:
-    #     raise HTTPException(status_code=404, detail="family_cards not found")
-                        
+                      
     return jsonable_encoder(family_cards_queries)
 
 

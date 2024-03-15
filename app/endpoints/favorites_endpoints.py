@@ -59,11 +59,7 @@ async def create_favorite(new_favorite_c: favorites_schemas.FavoriteCreate, db: 
 async def read_favorites_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     favorites_queries = db.query(models.Favorite).filter(models.Favorite.active == "True").order_by(models.Favorite.created_at).offset(skip).limit(limit).all()
-    
-    # pas de favorite
-    # if not favorites_queries:
-    #     raise HTTPException(status_code=404, detail="favorite not found")
-                        
+                       
     return jsonable_encoder(favorites_queries)
 
 
@@ -80,9 +76,6 @@ async def detail_favorite_by_attribute(refnumber: Optional[str] = None, entertai
     if entertainment_site_id is not None :
         favorite_query = db.query(models.Favorite).filter(models.Favorite.entertainment_site_id == entertainment_site_id, models.Favorite.active == "True").order_by(models.Favorite.created_at).offset(skip).limit(limit).all()
     
-    
-    if not favorite_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"favorite does not exist")
     return jsonable_encoder(favorite_query)
 
 # Get an favorite

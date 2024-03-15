@@ -68,14 +68,8 @@ async def create_user(new_user_c: users_schemas.UserCreate, db: Session = Depend
 async def read_users_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     users_queries = db.query(models.User).filter(models.User.active == "True").order_by(models.User.name).offset(skip).limit(limit).all()
-    print(users_queries)
-    
-    # pas de user
-    # if not users_queries:
-    #     raise HTTPException(status_code=404, detail="User not found")
                         
     return jsonable_encoder(users_queries)
-
 
 
 # Get an user
@@ -100,9 +94,6 @@ async def detail_user_by_attribut(refnumber: Optional[str] = None, phone: Option
     if is_owner is not None :
         user_query = db.query(models.User).filter(models.User.is_owner == is_owner, models.User.active == "True").order_by(models.User.name).offset(skip).limit(limit).all()
     
-    print(user_query)
-    if not user_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"User does not exist")
     return jsonable_encoder(user_query)
 
 # Get an user
@@ -151,10 +142,10 @@ async def detail_user(user_id: str, db: Session = Depends(get_db)):
 
 
 # update an user request
-@router.put("/update/{user_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = users_schemas.UserDetail)
+@router.put("/update/{user_id}", status_code = status.HTTP_200_OK, response_model = users_schemas.UserDetail)
 async def update_user(user_id: str, user_update: users_schemas.UserUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    user_query = db.query(models.User).filter(models.User.id == user_id, models.User.active == "True").first()
+    user_query = db.query(models.User).filter(models.User.id == user_id).first()
 
     if not user_query:
             
@@ -196,6 +187,39 @@ async def update_user(user_id: str, user_update: users_schemas.UserUpdate, db: S
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=403, detail="Somthing is wrong in the process , pleace try later sorry!")
+    
+    user_query = db.query(models.User).filter(models.User.id == user_id).first()
+    profils = user_query.profils
+    details = [{ 'id': profil.id, 'refnumber': profil.refnumber, 'fucntion': profil.fucntion, 'description': profil.description, 'owner_id': profil.owner_id, 'entertainment_site_id': profil.entertainment_site_id, 'active': profil.active} for profil in profils]
+    profils = details
+    
+    entertainment_sites = user_query.entertainment_sites
+    details = [{ 'id': entertainment_site.id, 'refnumber': entertainment_site.refnumber, 'name': entertainment_site.name, 'address': entertainment_site.address, 'description': entertainment_site.description, 'longitude': entertainment_site.longitude, 'latitude': entertainment_site.latitude, 'quarter_id': entertainment_site.quarter_id, 'owner_id': entertainment_site.owner_id, 'nb_visite': entertainment_site.nb_visite, 'active': entertainment_site.active} for entertainment_site in entertainment_sites]
+    entertainment_sites = details
+    
+    favorites = user_query.favorites
+    details = [{ 'id': favorite.id, 'refnumber': favorite.refnumber, 'owner_id': favorite.owner_id, 'entertainment_site_id': favorite.entertainment_site_id, 'active': favorite.active} for favorite in favorites]
+    favorites = details
+    
+    likes = user_query.likes
+    details = [{ 'id': like.id, 'refnumber': like.refnumber, 'owner_id': like.owner_id, 'event_id': like.event_id, 'anounce_id': like.anounce_id, 'reel_id': like.reel_id, 'story_id': like.story_id, 'active': like.active} for like in likes]
+    likes = details
+    
+    reels = user_query.reels
+    details = [{ 'id': reel.id, 'refnumber': reel.refnumber, 'link_media': reel.link_media, 'owner_id': reel.owner_id, 'description': reel.description, 'nb_vue': reel.nb_vue, 'active': reel.active} for reel in reels]
+    reels = details
+    
+    signals = user_query.signals
+    details = [{ 'id': signal.id, 'refnumber': signal.refnumber, 'owner_id': signal.owner_id, 'event_id': signal.event_id, 'anounce_id': signal.anounce_id, 'story_id': signal.story_id, 'story_id': signal.story_id, 'entertainment_site_id': signal.entertainment_site_id, 'active': signal.active} for signal in signals]
+    signals = details
+    
+    stories = user_query.stories
+    details = [{ 'id': storie.id, 'refnumber': storie.refnumber, 'link_media': storie.link_media, 'owner_id': storie.owner_id, 'description': storie.description, 'nb_vue': storie.nb_vue, 'active': storie.active} for storie in stories]
+    stories = details
+    
+    notes = user_query.notes
+    details = [{ 'id': note.id, 'refnumber': note.refnumber, 'owner_id': note.owner_id, 'entertainment_site_id': note.entertainment_site_id, 'note': note.note, 'active': note.active} for note in notes]
+    notes = details
         
     return jsonable_encoder(user_query)
 
@@ -228,10 +252,6 @@ async def delete_user(user_id: str,  db: Session = Depends(get_db),current_user 
 async def read_users_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     users_queries = db.query(models.User).filter(models.User.active == "False").order_by(models.User.name).offset(skip).limit(limit).all()
-    
-    # pas de user
-    # if not users_queries:
-    #     raise HTTPException(status_code=404, detail="Users not found")
                         
     return jsonable_encoder(users_queries)
 

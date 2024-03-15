@@ -50,11 +50,7 @@ async def create_anounce(new_anounce_c: anounces_schemas.AnounceCreate, db: Sess
 async def read_anounces_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     anounces_queries = db.query(models.Anounce).filter(models.Anounce.active == "True").order_by(models.Anounce.created_at).offset(skip).limit(limit).all()
-    
-    # pas de anounce
-    # if not anounces_queries:
-    #     raise HTTPException(status_code=404, detail="Anounce not found")
-                        
+                     
     return jsonable_encoder(anounces_queries)
 
 
@@ -73,9 +69,6 @@ async def detail_anounce_by_attribute(refnumber: Optional[str] = None, entertain
     if description is not None:
         anounce_query = db.query(models.Anounce).filter(models.Anounce.description.contains(description), models.Anounce.active == "True").order_by(models.Anounce.created_at).offset(skip).limit(limit).all()
     
-    
-    if not anounce_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Anounce does not exist")
     return jsonable_encoder(anounce_query)
 
 # Get an anounce
@@ -110,7 +103,7 @@ async def detail_anounce(anounce_id: str, db: Session = Depends(get_db)):
 
 
 # update an anounce request
-@router.put("/update/{anounce_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = anounces_schemas.AnounceDetail)
+@router.put("/update/{anounce_id}", status_code=status.HTTP_200_OK, response_model = anounces_schemas.AnounceDetail)
 async def update_anounce(anounce_id: str, anounce_update: anounces_schemas.AnounceUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
     anounce_query = db.query(models.Anounce).filter(models.Anounce.id == anounce_id, models.Anounce.active == "True").first()
@@ -142,6 +135,20 @@ async def update_anounce(anounce_id: str, anounce_update: anounces_schemas.Anoun
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=403, detail="Somthing is wrong in the process , pleace try later sorry!")
+    
+    anounce_query = db.query(models.Anounce).filter(models.Anounce.id == anounce_id).first()
+    
+    anounce_multimedias = anounce_query.anounce_multimedias
+    details = [{ 'id': anounce_multimedia.id, 'refnumber': anounce_multimedia.refnumber, 'link_media': anounce_multimedia.link_media, 'anounce_id': anounce_multimedia.anounce_id, 'active': anounce_multimedia.active} for anounce_multimedia in anounce_multimedias]
+    anounce_multimedias = details
+    
+    likes = anounce_query.likes
+    details = [{ 'id': like.id, 'refnumber': like.refnumber, 'owner_id': like.owner_id, 'event_id': like.event_id, 'anounce_id': like.anounce_id, 'reel_id': like.reel_id, 'story_id': like.story_id, 'active': like.active} for like in likes]
+    likes = details
+    
+    signals = anounce_query.signals
+    details = [{ 'id': signal.id, 'refnumber': signal.refnumber, 'owner_id': signal.owner_id, 'event_id': signal.event_id, 'anounce_id': signal.anounce_id, 'story_id': signal.story_id, 'story_id': signal.story_id, 'entertainment_site_id': signal.entertainment_site_id, 'active': signal.active} for signal in signals]
+    signals = details
         
     return jsonable_encoder(anounce_query)
 

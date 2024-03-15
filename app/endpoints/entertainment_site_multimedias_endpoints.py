@@ -50,11 +50,7 @@ async def create_entertainment_site_multimedia(new_entertainment_site_multimedia
 async def read_entertainment_site_multimedias_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     entertainment_site_multimedias_queries = db.query(models.EntertainmentSiteMultimedia).filter(models.EntertainmentSiteMultimedia.active == "True").order_by(models.EntertainmentSiteMultimedia.created_at).offset(skip).limit(limit).all()
-    
-    # pas de entertainment_site_multimedia
-    # if not entertainment_site_multimedias_queries:
-    #     raise HTTPException(status_code=404, detail="entertainment_site_multimedia not found")
-                        
+                       
     return jsonable_encoder(entertainment_site_multimedias_queries)
 
 # Get an entertainment_site_multimedia
@@ -77,18 +73,15 @@ async def detail_entertainment_site_multimedia_by_attribute(refnumber: Optional[
     if entertainment_site_id is not None :
         entertainment_site_multimedia_query = db.query(models.EntertainmentSiteMultimedia).filter(models.EntertainmentSiteMultimedia.entertainment_site_id == entertainment_site_id, models.EntertainmentSiteMultimedia.active == "True").order_by(models.EntertainmentSiteMultimedia.created_at).offset(skip).limit(limit).all()
     
-    
-    if not entertainment_site_multimedia_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"entertainment_site_multimedia does not exist")
     return jsonable_encoder(entertainment_site_multimedia_query)
 
 
 
 # update an entertainment_site_multimedia request
-@router.put("/update/{entertainment_site_multimedia_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = entertainment_site_multimedias_schemas.EntertainmentSiteMultimediaDetail)
+@router.put("/update/{entertainment_site_multimedia_id}", status_code = status.HTTP_200_OK, response_model = entertainment_site_multimedias_schemas.EntertainmentSiteMultimediaDetail)
 async def update_entertainment_site_multimedia(entertainment_site_multimedia_id: str, entertainment_site_multimedia_update: entertainment_site_multimedias_schemas.EntertainmentSiteMultimediaUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    entertainment_site_multimedia_query = db.query(models.EntertainmentSiteMultimedia).filter(models.EntertainmentSiteMultimedia.id == entertainment_site_multimedia_id, models.EntertainmentSiteMultimedia.active == "True").first()
+    entertainment_site_multimedia_query = db.query(models.EntertainmentSiteMultimedia).filter(models.EntertainmentSiteMultimedia.id == entertainment_site_multimedia_id).first()
 
     if not entertainment_site_multimedia_query:
             
@@ -117,7 +110,7 @@ async def update_entertainment_site_multimedia(entertainment_site_multimedia_id:
 @router.patch("/delete/{entertainment_site_multimedia_id}", status_code = status.HTTP_204_NO_CONTENT)
 async def delete_entertainment_site_multimedia(entertainment_site_multimedia_id: str,  db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
-    entertainment_site_multimedia_query = db.query(models.EntertainmentSiteMultimedia).filter(models.EntertainmentSiteMultimedia.id == entertainment_site_multimedia_id, models.EntertainmentSiteMultimedia.active == "True").first()
+    entertainment_site_multimedia_query = db.query(models.EntertainmentSiteMultimedia).filter(models.EntertainmentSiteMultimedia.id == entertainment_site_multimedia_id).first()
     
     if not entertainment_site_multimedia_query:    
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"entertainment_site_multimedia with id: {entertainment_site_multimedia_id} does not exist")

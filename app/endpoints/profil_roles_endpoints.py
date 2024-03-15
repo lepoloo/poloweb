@@ -53,11 +53,7 @@ async def create_profil_role(new_profil_role_c: profil_roles_schemas.ProfilRoleC
 async def read_profil_roles_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     profil_roles_queries = db.query(models.ProfilRole).filter(models.ProfilRole.active == "True").order_by(models.ProfilRole.created_at).offset(skip).limit(limit).all()
-    
-    # pas de profil_role
-    # if not profil_roles_queries:
-    #     raise HTTPException(status_code=404, detail="profil_role not found")
-                        
+                      
     return jsonable_encoder(profil_roles_queries)
 
 # Get an profil_role
@@ -80,18 +76,15 @@ async def detail_profil_role_by_attribute(refnumber: Optional[str] = None, profi
     if role_id is not None :
         profil_role_query = db.query(models.ProfilRole).filter(models.ProfilRole.role_id == role_id, models.ProfilRole.active == "True").order_by(models.ProfilRole.created_at).offset(skip).limit(limit).all()
     
-    
-    if not profil_role_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"profil_role does not exist")
     return jsonable_encoder(profil_role_query)
 
 
 
 # update an permission request
-@router.put("/update/{profil_role_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = profil_roles_schemas.ProfilRoleDetail)
+@router.put("/update/{profil_role_id}", status_code = status.HTTP_200_OK, response_model = profil_roles_schemas.ProfilRoleDetail)
 async def update_profil_role(profil_role_id: str, profil_role_update: profil_roles_schemas.ProfilRoleUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    profil_role_query = db.query(models.ProfilRole).filter(models.ProfilRole.id == profil_role_id, models.ProfilRole.active == "True").first()
+    profil_role_query = db.query(models.ProfilRole).filter(models.ProfilRole.id == profil_role_id).first()
 
     if not profil_role_query:
             
@@ -143,11 +136,7 @@ async def delete_profil_role(profil_role_id: str,  db: Session = Depends(get_db)
 async def read_profil_roles_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     profil_roles_queries = db.query(models.ProfilRole).filter(models.ProfilRole.active == "False").order_by(models.ProfilRole.created_at).offset(skip).limit(limit).all()
-    
-    # pas de profil_role
-    # if not profil_roles_queries:
-    #     raise HTTPException(status_code=404, detail="profil_roles not found")
-                        
+                      
     return jsonable_encoder(profil_roles_queries)
 
 

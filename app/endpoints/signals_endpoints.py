@@ -74,11 +74,7 @@ async def create_signal(new_signal_c: signals_schemas.SignalCreate, db: Session 
 @router.get("/get_all_actif/", response_model=List[signals_schemas.SignalListing])
 async def read_signals_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
-    signals_queries = db.query(models.Signal).filter(models.Signal.active == "True").order_by(models.Signal.create_at).offset(skip).limit(limit).all()
-    
-    # pas de signal
-    # if not signals_queries:
-    #     raise HTTPException(status_code=404, detail="signal not found")
+    signals_queries = db.query(models.Signal).filter(models.Signal.active == "True").order_by(models.Signal.created_at).offset(skip).limit(limit).all()
                         
     return jsonable_encoder(signals_queries)
 
@@ -90,23 +86,20 @@ async def read_signals_actif(skip: int = 0, limit: int = 100, db: Session = Depe
 async def detail_signal_by_attribute(refnumber: Optional[str] = None, event_id: Optional[str] = None, owner_id: Optional[str] = None, anounce_id: Optional[str] = None, reel_id: Optional[str] = None, story_id: Optional[str] = None, entertainment_site_id: Optional[str] = None, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     signal_query = {} # objet vide
     if refnumber is not None :
-        signal_query = db.query(models.Signal).filter(models.Signal.refnumber == refnumber).order_by(models.Signal.create_at).offset(skip).limit(limit).all()
+        signal_query = db.query(models.Signal).filter(models.Signal.refnumber == refnumber).order_by(models.Signal.created_at).offset(skip).limit(limit).all()
     if owner_id is not None :
-        signal_query = db.query(models.Signal).filter(models.Signal.owner_id == owner_id).order_by(models.Signal.create_at).offset(skip).limit(limit).all()
+        signal_query = db.query(models.Signal).filter(models.Signal.owner_id == owner_id).order_by(models.Signal.created_at).offset(skip).limit(limit).all()
     if event_id is not None :
-        signal_query = db.query(models.Signal).filter(models.Signal.event_id == event_id).order_by(models.Signal.create_at).offset(skip).limit(limit).all()
+        signal_query = db.query(models.Signal).filter(models.Signal.event_id == event_id).order_by(models.Signal.created_at).offset(skip).limit(limit).all()
     if anounce_id is not None :
-        signal_query = db.query(models.Signal).filter(models.Signal.anounce_id == anounce_id).order_by(models.Signal.create_at).offset(skip).limit(limit).all()
+        signal_query = db.query(models.Signal).filter(models.Signal.anounce_id == anounce_id).order_by(models.Signal.created_at).offset(skip).limit(limit).all()
     if reel_id is not None :
-        signal_query = db.query(models.Signal).filter(models.Signal.reel_id == reel_id).order_by(models.Signal.create_at).offset(skip).limit(limit).all()
+        signal_query = db.query(models.Signal).filter(models.Signal.reel_id == reel_id).order_by(models.Signal.created_at).offset(skip).limit(limit).all()
     if story_id is not None :
-        signal_query = db.query(models.Signal).filter(models.Signal.story_id == story_id).order_by(models.Signal.create_at).offset(skip).limit(limit).all()
+        signal_query = db.query(models.Signal).filter(models.Signal.story_id == story_id).order_by(models.Signal.created_at).offset(skip).limit(limit).all()
     if entertainment_site_id is not None :
-        signal_query = db.query(models.Signal).filter(models.Signal.entertainment_site_id == entertainment_site_id).order_by(models.Signal.create_at).offset(skip).limit(limit).all()
+        signal_query = db.query(models.Signal).filter(models.Signal.entertainment_site_id == entertainment_site_id).order_by(models.Signal.created_at).offset(skip).limit(limit).all()
     
-    
-    if not signal_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"signal does not exist")
     
     return jsonable_encoder(signal_query)
 

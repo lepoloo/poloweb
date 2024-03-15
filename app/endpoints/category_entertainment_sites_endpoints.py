@@ -56,11 +56,7 @@ async def create_category_entertainment_site(new_category_entertainment_site_c: 
 async def read_category_entertainment_sites_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     category_entertainment_sites_queries = db.query(models.CategoryEntertainmentSite).filter(models.CategoryEntertainmentSite.active == "True").order_by(models.CategoryEntertainmentSite.entertainment_site_id).offset(skip).limit(limit).all()
-    
-    # pas de category_entertainment_site
-    # if not category_entertainment_sites_queries:
-    #     raise HTTPException(status_code=404, detail="category_entertainment_site not found")
-                        
+                    
     return jsonable_encoder(category_entertainment_sites_queries)
 
 # Get an category_entertainment_site
@@ -86,14 +82,12 @@ async def detail_category_entertainment_site_by_attribute(refnumber: Optional[st
         category_entertainment_site_query = db.query(models.CategoryEntertainmentSite).filter(models.CategoryEntertainmentSite.category_site_id == category_site_id).order_by(models.CategoryEntertainmentSite.entertainment_site_id).offset(skip).limit(limit).all()
     
     
-    if not category_entertainment_site_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"category_entertainment_site does not exist")
     return jsonable_encoder(category_entertainment_site_query)
 
 
 
 # update an category_entertainment_site request
-@router.put("/update/{category_entertainment_site_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = category_entertainment_sites_schemas.CategoryEntertainmentSiteDetail)
+@router.put("/update/{category_entertainment_site_id}", status_code = status.HTTP_200_OK, response_model = category_entertainment_sites_schemas.CategoryEntertainmentSiteDetail)
 async def update_category_entertainment_site(category_entertainment_site_id: str, category_entertainment_site_update: category_entertainment_sites_schemas.CategoryEntertainmentSiteUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
     category_entertainment_site_query = db.query(models.CategoryEntertainmentSite).filter(models.CategoryEntertainmentSite.id == category_entertainment_site_id, models.CategoryEntertainmentSite.active == "True").first()

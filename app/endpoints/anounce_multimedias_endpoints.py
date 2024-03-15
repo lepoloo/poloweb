@@ -82,8 +82,6 @@ async def detail_anounce_multimedia_by_attribute(refnumber: Optional[str] = None
         anounce_multimedia_query = db.query(models.AnounceMultimedia).filter(models.AnounceMultimedia.anounce_id == anounce_id, models.AnounceMultimedia.active == "True").order_by(models.AnounceMultimedia.link_media).offset(skip).limit(limit).all()
     
     
-    if not anounce_multimedia_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"anounce_multimedia does not exist")
     return jsonable_encoder(anounce_multimedia_query)
 
 

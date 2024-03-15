@@ -54,17 +54,13 @@ async def create_menu(new_menu_c: menus_schemas.MenuCreate, db: Session = Depend
 async def read_menus_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     menus_queries = db.query(models.Menu).filter(models.Menu.active == "True").order_by(models.Menu.card_id).offset(skip).limit(limit).all()
-    
-    # pas de menu
-    # if not menus_queries:
-    #     raise HTTPException(status_code=404, detail="menu not found")
-                        
+                      
     return jsonable_encoder(menus_queries)
 
 # Get an menu
 @router.get("/get/{menu_id}", status_code=status.HTTP_200_OK, response_model=menus_schemas.MenuDetail)
 async def detail_menu(menu_id: str, db: Session = Depends(get_db)):
-    menu_query = db.query(models.Menu).filter(models.Menu.id == menu_id, models.Menu.active == "True").first()
+    menu_query = db.query(models.Menu).filter(models.Menu.id == menu_id).first()
     if not menu_query:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Menu with id: {menu_id} does not exist")
     return jsonable_encoder(menu_query)
@@ -83,18 +79,15 @@ async def detail_menu_by_attribute(refnumber: Optional[str] = None, product_id: 
     if price is not None :
         menu_query = db.query(models.Menu).filter(models.Menu.price == price).order_by(models.Menu.card_id).offset(skip).limit(limit).all()
     
-    
-    if not menu_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"menu does not exist")
     return jsonable_encoder(menu_query)
 
 
 
 # update an menu request
-@router.put("/update/{menu_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = menus_schemas.MenuDetail)
+@router.put("/update/{menu_id}", status_code = status.HTTP_200_OK, response_model = menus_schemas.MenuDetail)
 async def update_menu(menu_id: str, menu_update: menus_schemas.MenuUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    menu_query = db.query(models.Menu).filter(models.Menu.id == menu_id, models.Menu.active == "True").first()
+    menu_query = db.query(models.Menu).filter(models.Menu.id == menu_id).first()
 
     if not menu_query:
             
@@ -149,10 +142,6 @@ async def delete_menu(menu_id: str,  db: Session = Depends(get_db), current_user
 async def read_menus_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     menus_queries = db.query(models.Menu).filter(models.Menu.active == "False").order_by(models.Menu.card_id).offset(skip).limit(limit).all()
-    
-    # pas de menu
-    # if not menus_queries:
-    #     raise HTTPException(status_code=404, detail="menus not found")
                         
     return jsonable_encoder(menus_queries)
 

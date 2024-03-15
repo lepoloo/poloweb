@@ -56,11 +56,7 @@ async def create_schedule_time(new_schedule_time_c: schedule_times_schemas.Sched
 async def read_schedule_time_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     schedule_times_queries = db.query(models.ScheduleTime).filter(models.ScheduleTime.active == "True").order_by(models.ScheduleTime.program_id).offset(skip).limit(limit).all()
-    
-    # pas de schedule_time
-    # if not schedule_times_queries:
-    #     raise HTTPException(status_code=404, detail="schedule_time not found")
-                        
+                      
     return jsonable_encoder(schedule_times_queries)
 
 
@@ -89,18 +85,15 @@ async def detail_schedule_time_by_attribute(daily_day: Optional[str] = None, ope
     if program_id is not None :
         schedule_time_query = db.query(models.ScheduleTime).filter(models.ScheduleTime.program_id == program_id, models.ScheduleTime.active == "True").order_by(models.ScheduleTime.program_id).offset(skip).limit(limit).all()
        
-    
-    if not schedule_time_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"schedule_time does not exist")
     return jsonable_encoder(schedule_time_query)
 
 
 
 # update an permission request
-@router.put("/update/{schedule_time_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = schedule_times_schemas.ScheduleTimeDetail)
+@router.put("/update/{schedule_time_id}", status_code = status.HTTP_200_OK, response_model = schedule_times_schemas.ScheduleTimeDetail)
 async def update_schedule_time(schedule_time_id: str, schedule_time_update: schedule_times_schemas.ScheduleTimeUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    schedule_time_query = db.query(models.ScheduleTime).filter(models.ScheduleTime.id == schedule_time_id, models.ScheduleTime.active == "True").first()
+    schedule_time_query = db.query(models.ScheduleTime).filter(models.ScheduleTime.id == schedule_time_id).first()
 
     if not schedule_time_query:
             
@@ -156,11 +149,7 @@ async def delete_schedule_time(schedule_time_id: str,  db: Session = Depends(get
 async def read_schedule_times_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     schedule_times_queries = db.query(models.ScheduleTime).filter(models.ScheduleTime.active == "False", ).order_by(models.ScheduleTime.program_id).offset(skip).limit(limit).all()
-    
-    # pas de schedule_time
-    # if not schedule_times_queries:
-    #     raise HTTPException(status_code=404, detail="schedule_times not found")
-                        
+                      
     return jsonable_encoder(schedule_times_queries)
 
 

@@ -65,11 +65,7 @@ async def read_reels_actif(skip: int = 0, limit: int = 100, db: Session = Depend
         await delete_media(reels_querie.link_media, "reel_medias")
     
     reels_queries = db.query(models.Reel).filter(models.Reel.active == "True").order_by(models.Reel.created_at).offset(skip).limit(limit).all()
-    
-    # pas de reel
-    # if not reels_queries:
-    #     raise HTTPException(status_code=404, detail="reel not found")
-                        
+                      
     return jsonable_encoder(reels_queries)
 
 
@@ -88,9 +84,6 @@ async def detail_reel_by_attribute(refnumber: Optional[str] = None, owner_id: Op
     if description is not None:
         reel_query = db.query(models.Reel).filter(models.Reel.description.contains(description), models.Reel.active == "True").order_by(models.Reel.created_at).offset(skip).limit(limit).all()
     
-    
-    if not reel_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"reel does not exist")
     return jsonable_encoder(reel_query)
 
 # Get an reel
@@ -119,12 +112,8 @@ async def detail_reel(reel_id: str, db: Session = Depends(get_db)):
     
     return jsonable_encoder(reel_query)
 
-
-
-
-
 # update an reel request
-@router.put("/update/{reel_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = reels_schemas.ReelDetail)
+@router.put("/update/{reel_id}", status_code = status.HTTP_200_OK, response_model = reels_schemas.ReelDetail)
 async def update_reel(reel_id: str, reel_update: reels_schemas.ReelUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
     reel_query = db.query(models.Reel).filter(models.Reel.id == reel_id, models.Reel.active == "True").first()
@@ -150,6 +139,15 @@ async def update_reel(reel_id: str, reel_update: reels_schemas.ReelUpdate, db: S
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=403, detail="Somthing is wrong in the process , pleace try later sorry!")
+    
+    reel_query = db.query(models.Reel).filter(models.Reel.id == reel_id).first()
+    likes = reel_query.likes
+    details = [{ 'id': like.id, 'refnumber': like.refnumber, 'owner_id': like.owner_id, 'event_id': like.event_id, 'anounce_id': like.anounce_id, 'reel_id': like.reel_id, 'story_id': like.story_id, 'active': like.active} for like in likes]
+    likes = details
+    
+    signals = reel_query.signals
+    details = [{ 'id': signal.id, 'refnumber': signal.refnumber, 'owner_id': signal.owner_id, 'event_id': signal.event_id, 'anounce_id': signal.anounce_id, 'story_id': signal.story_id, 'story_id': signal.story_id, 'entertainment_site_id': signal.entertainment_site_id, 'active': signal.active} for signal in signals]
+    signals = details
         
     return jsonable_encoder(reel_query)
 

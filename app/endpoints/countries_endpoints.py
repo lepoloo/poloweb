@@ -53,10 +53,6 @@ async def create_country(new_country_c: countries_schemas.CountryCreate, db: Ses
 async def read_countrys_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     countries_queries = db.query(models.Country).filter(models.Country.active == "True").order_by(models.Country.name).offset(skip).limit(limit).all()
-    
-    # pas de country
-    # if not countries_queries:
-    #     raise HTTPException(status_code=404, detail="country not found")
                         
     return jsonable_encoder(countries_queries)
 
@@ -72,15 +68,12 @@ async def detail_country_by_attribute(refnumber: Optional[str] = None, name: Opt
     if name is not None :
         country_query = db.query(models.Country).filter(models.Country.name.contains(name), models.Country.active == "True" ).order_by(models.Country.name).offset(skip).limit(limit).all()
     
-    
-    if not country_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"country does not exist")
     return jsonable_encoder(country_query)
 
 # Get an country
 @router.get("/get/{country_id}", status_code=status.HTTP_200_OK, response_model=countries_schemas.CountryDetail)
 async def detail_country(country_id: str, db: Session = Depends(get_db)):
-    country_query = db.query(models.Country).filter(models.Country.id == country_id, models.Country.active == "True").first()
+    country_query = db.query(models.Country).filter(models.Country.id == country_id).first()
     if not country_query:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"country with id: {country_id} does not exist")
     
@@ -92,13 +85,11 @@ async def detail_country(country_id: str, db: Session = Depends(get_db)):
 
 
 
-
-
 # update an country request
-@router.put("/update/{country_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = countries_schemas.CountryDetail)
+@router.put("/update/{country_id}", status_code = status.HTTP_200_OK, response_model = countries_schemas.CountryDetail)
 async def update_country(country_id: str, country_update: countries_schemas.CountryUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    country_query = db.query(models.Country).filter(models.Country.id == country_id, models.Country.active == "True").first()
+    country_query = db.query(models.Country).filter(models.Country.id == country_id).first()
 
     if not country_query:
             
@@ -117,6 +108,11 @@ async def update_country(country_id: str, country_update: countries_schemas.Coun
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=403, detail="Somthing is wrong in the process , pleace try later sorry!")
+    
+    country_query = db.query(models.Country).filter(models.Country.id == country_id).first()
+    towns = country_query.towns
+    details = [{ 'id': town.id, 'refnumber': town.refnumber, 'name': town.name, 'country_id': town.country_id, 'active': town.active} for town in towns]
+    towns = details
         
     return jsonable_encoder(country_query)
 
@@ -149,11 +145,7 @@ async def delete_country(country_id: str,  db: Session = Depends(get_db), curren
 async def read_countrys_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     countries_queries = db.query(models.Country).filter(models.Country.active == "False").order_by(models.Country.name).offset(skip).limit(limit).all()
-    
-    # pas de country
-    # if not countries_queries:
-    #     raise HTTPException(status_code=404, detail="countrys not found")
-                        
+                      
     return jsonable_encoder(countries_queries)
 
 

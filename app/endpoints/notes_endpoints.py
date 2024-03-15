@@ -63,11 +63,7 @@ async def create_note(new_note_c: notes_schemas.NoteCreate, db: Session = Depend
 async def read_notes_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     notes_queries = db.query(models.Note).filter(models.Note.active == "True").order_by(models.Note.entertainment_site_id).offset(skip).limit(limit).all()
-    
-    # pas de note
-    # if not notes_queries:
-    #     raise HTTPException(status_code=404, detail="note not found")
-                        
+                      
     return jsonable_encoder(notes_queries)
 
 
@@ -84,9 +80,6 @@ async def detail_note_by_attribute(refnumber: Optional[str] = None, entertainmen
     if entertainment_site_id is not None :
         note_query = db.query(models.Note).filter(models.Note.entertainment_site_id == entertainment_site_id).order_by(models.Note.entertainment_site_id).offset(skip).limit(limit).all()
     
-    
-    if not note_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"note does not exist")
     return jsonable_encoder(note_query)
 
 # Get an note

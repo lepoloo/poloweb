@@ -51,14 +51,9 @@ async def create_town(new_town_c: towns_schemas.TownCreate, db: Session = Depend
 @router.get("/get_all_actif/", response_model=List[towns_schemas.TownListing])
 async def read_towns_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
-    # towns_queries = db.query(models.Town).filter(models.Town.active == "True" ).order_by(models.Town.name).offset(skip).limit(limit).all()
     # Récupérez les villes du pays
     towns_queries = db.query(models.Town).filter(models.Town.active == "True").order_by(models.Town.name).join(models.Country).filter(models.Country.id == models.Town.country_id).group_by(models.Town.id).limit(limit).offset(skip).all()
-    
-    # pas de town
-    # if not towns_queries:
-    #     raise HTTPException(status_code=404, detail="town not found")
-                        
+                      
     return jsonable_encoder(towns_queries)
 
 
@@ -75,9 +70,6 @@ async def detail_town_by_attribute(refnumber: Optional[str] = None, country_id: 
     if country_id is not None :
         town_query = db.query(models.Town).filter(models.Town.country_id == country_id, models.Town.active == "True").order_by(models.Town.name).offset(skip).limit(limit).all()
     
-    
-    if not town_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"town does not exist")
     return jsonable_encoder(town_query)
 
 # Get an town
@@ -98,10 +90,10 @@ async def detail_town(town_id: str, db: Session = Depends(get_db)):
 
 
 # update an town request
-@router.put("/update/{town_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = towns_schemas.TownDetail)
+@router.put("/update/{town_id}", status_code = status.HTTP_200_OK, response_model = towns_schemas.TownDetail)
 async def update_town(town_id: str, town_update: towns_schemas.TownUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    town_query = db.query(models.Town).filter(models.Town.id == town_id, models.Town.active == "True").first()
+    town_query = db.query(models.Town).filter(models.Town.id == town_id).first()
 
     if not town_query:
             
@@ -122,7 +114,12 @@ async def update_town(town_id: str, town_update: towns_schemas.TownUpdate, db: S
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=403, detail="Somthing is wrong in the process , pleace try later sorry!")
-        
+    
+    town_query = db.query(models.Town).filter(models.Town.id == town_id).first()
+    quaters = town_query.quaters
+    details = [{ 'id': quater.id, 'refnumber': quater.refnumber, 'name': quater.name, 'town_id': quater.town_id, 'active': quater.active} for quater in quaters]
+    quaters = details
+       
     return jsonable_encoder(town_query)
 
 
@@ -154,10 +151,6 @@ async def delete_town(town_id: str,  db: Session = Depends(get_db), current_user
 async def read_towns_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     towns_queries = db.query(models.Town).filter(models.Town.active == "False").order_by(models.Town.name).offset(skip).limit(limit).all()
-    
-    # pas de town
-    # if not towns_queries:
-    #     raise HTTPException(status_code=404, detail="towns not found")
                         
     return jsonable_encoder(towns_queries)
 

@@ -52,11 +52,7 @@ async def create_event_multimedia(new_event_multimedia_c: event_multimedias_sche
 async def read_event_multimedias_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     event_multimedias_queries = db.query(models.EventMultimedia).filter(models.EventMultimedia.active == "True").order_by(models.EventMultimedia.created_at).offset(skip).limit(limit).all()
-    
-    # pas de event_multimedia
-    # if not event_multimedias_queries:
-    #     raise HTTPException(status_code=404, detail="event_multimedia not found")
-                        
+                       
     return jsonable_encoder(event_multimedias_queries)
 
 # Get an event_multimedia
@@ -79,18 +75,15 @@ async def detail_event_multimedia_by_attribute(refnumber: Optional[str] = None, 
     if event_id is not None :
         event_multimedia_query = db.query(models.EventMultimedia).filter(models.EventMultimedia.event_id == event_id, models.EventMultimedia.active == "True").order_by(models.EventMultimedia.created_at).offset(skip).limit(limit).all()
     
-    
-    if not event_multimedia_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"event_multimedia does not exist")
     return jsonable_encoder(event_multimedia_query)
 
 
 
 # update an event_multimedia request
-@router.put("/update/{event_multimedia_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = event_multimedias_schemas.EventMultimediaDetail)
+@router.put("/update/{event_multimedia_id}", status_code = status.HTTP_200_OK, response_model = event_multimedias_schemas.EventMultimediaDetail)
 async def update_event_multimedia(event_multimedia_id: str, event_multimedia_update: event_multimedias_schemas.EventMultimediaUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    event_multimedia_query = db.query(models.EventMultimedia).filter(models.EventMultimedia.id == event_multimedia_id, models.EventMultimedia.active == "True").first()
+    event_multimedia_query = db.query(models.EventMultimedia).filter(models.EventMultimedia.id == event_multimedia_id).first()
 
     if not event_multimedia_query:
             
@@ -143,10 +136,6 @@ async def delete_event_multimedia(event_multimedia_id: str,  db: Session = Depen
 async def read_event_multimedias_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     event_multimedias_queries = db.query(models.EventMultimedia).filter(models.EventMultimedia.active == "False", ).offset(skip).limit(limit).all()
-    
-    # pas de event_multimedia
-    # if not event_multimedias_queries:
-    #     raise HTTPException(status_code=404, detail="event_multimedias not found")
                         
     return jsonable_encoder(event_multimedias_queries)
 
@@ -155,7 +144,7 @@ async def read_event_multimedias_inactive(skip: int = 0, limit: int = 100, db: S
 @router.patch("/restore/{event_multimedia_id}", status_code = status.HTTP_200_OK,response_model = event_multimedias_schemas.EventMultimediaListing)
 async def restore_event_multimedia(event_multimedia_id: str,  db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
-    event_multimedia_query = db.query(models.EventMultimedia).filter(models.EventMultimedia.id == event_multimedia_id, models.EventMultimedia.active == "False").first()
+    event_multimedia_query = db.query(models.EventMultimedia).filter(models.EventMultimedia.id == event_multimedia_id).first()
     
     if not event_multimedia_query:  
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"event_multimedia with id: {event_multimedia_id} does not exist")

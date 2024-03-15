@@ -16,7 +16,6 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 models.Base.metadata.create_all(bind=engine)
 
-
 # /type_products/
 
 router = APIRouter(prefix = "/type_product", tags=['Type products Requests'])
@@ -54,10 +53,6 @@ async def create_type_product(new_type_product_c: type_products_schemas.TypeProd
 async def read_type_product_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     type_products_queries = db.query(models.TypeProduct).filter(models.TypeProduct.active == "True").order_by(models.TypeProduct.name).offset(skip).limit(limit).all()
-    
-    # pas de type_product
-    # if not type_products_queries:
-    #     raise HTTPException(status_code=404, detail="Type product not found")
                         
     return jsonable_encoder(type_products_queries)
 
@@ -65,7 +60,7 @@ async def read_type_product_actif(skip: int = 0, limit: int = 100, db: Session =
 # Get an type_product
 @router.get("/get/{type_product_id}", status_code=status.HTTP_200_OK, response_model=type_products_schemas.TypeProductDetail)
 async def detail_type_product(type_product_id: str, db: Session = Depends(get_db)):
-    type_product_query = db.query(models.TypeProduct).filter(models.TypeProduct.id == type_product_id, models.TypeProduct.active == "True").first()
+    type_product_query = db.query(models.TypeProduct).filter(models.TypeProduct.id == type_product_id).first()
     if not type_product_query:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"type_product with id: {type_product_id} does not exist")
     
@@ -73,10 +68,7 @@ async def detail_type_product(type_product_id: str, db: Session = Depends(get_db
     details = [{ 'id': product.id, 'refnumber': product.refnumber, 'name': product.name, 'type_product_id': product.type_product_id, 'description': product.description, 'price': product.price, 'active': product.active} for product in products]
     products = details
     
-    
     return jsonable_encoder(type_product_query)
-
-
 
 
 # Get an type_product
@@ -89,15 +81,12 @@ async def detail_type_product_by_attribute(name: Optional[str] = None, descripti
     if description is not None :
         type_product_query = db.query(models.TypeProduct).filter(models.TypeProduct.description.contains(description), models.TypeProduct.active == "True").order_by(models.TypeProduct.name).offset(skip).limit(limit).all()
        
-    
-    if not type_product_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"type_product does not exist")
     return jsonable_encoder(type_product_query)
 
 
 
 # update an type product request
-@router.put("/update/{type_product_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = type_products_schemas.TypeProductDetail)
+@router.put("/update/{type_product_id}", status_code = status.HTTP_200_OK, response_model = type_products_schemas.TypeProductDetail)
 async def update_type_product(type_product_id: str, type_product_update: type_products_schemas.TypeProductUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
     type_product_query = db.query(models.TypeProduct).filter(models.TypeProduct.id == type_product_id, models.TypeProduct.active == "True").first()
@@ -120,6 +109,12 @@ async def update_type_product(type_product_id: str, type_product_update: type_pr
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=403, detail="Somthing is wrong in the process , pleace try later sorry!")
+    
+    type_product_query = db.query(models.TypeProduct).filter(models.TypeProduct.id == type_product_id).first()
+    
+    products = type_product_query.products
+    details = [{ 'id': product.id, 'refnumber': product.refnumber, 'name': product.name, 'type_product_id': product.type_product_id, 'description': product.description, 'price': product.price, 'active': product.active} for product in products]
+    products = details
         
     return jsonable_encoder(type_product_query)
 
@@ -152,11 +147,7 @@ async def delete_type_product(type_product_id: str,  db: Session = Depends(get_d
 async def read_type_products_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     type_products_queries = db.query(models.TypeProduct).filter(models.TypeProduct.active == "False", ).order_by(models.TypeProduct.name).offset(skip).limit(limit).all()
-    
-    # pas de type_product
-    # if not type_products_queries:
-    #     raise HTTPException(status_code=404, detail="type_products not found")
-                        
+                     
     return jsonable_encoder(type_products_queries)
 
 

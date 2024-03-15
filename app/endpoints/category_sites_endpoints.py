@@ -53,11 +53,7 @@ async def create_category_site(new_category_site_c: category_sites_schemas.Categ
 async def read_category_site_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     category_sites_queries = db.query(models.CategorySite).filter(models.CategorySite.active == "True").order_by(models.CategorySite.name).offset(skip).limit(limit).all()
-    
-    # pas de category_site
-    # if not category_sites_queries:
-    #     raise HTTPException(status_code=404, detail="category_site not found")
-                        
+                      
     return jsonable_encoder(category_sites_queries)
 
 
@@ -88,17 +84,15 @@ async def detail_category_site_by_attribute(name: Optional[str] = None, descript
         category_site_query = db.query(models.CategorySite).filter(models.CategorySite.description.contains(description), models.CategorySite.active == "True").order_by(models.CategorySite.name).offset(skip).limit(limit).all()
        
     
-    if not category_site_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"category_site does not exist")
     return jsonable_encoder(category_site_query)
 
 
 
 # update an permission request
-@router.put("/update/{category_site_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = category_sites_schemas.CategorySiteDetail)
+@router.put("/update/{category_site_id}", status_code = status.HTTP_200_OK, response_model = category_sites_schemas.CategorySiteDetail)
 async def update_category_site(category_site_id: str, category_site_update: category_sites_schemas.CategorySiteUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    category_site_query = db.query(models.CategorySite).filter(models.CategorySite.id == category_site_id, models.CategorySite.active == "True").first()
+    category_site_query = db.query(models.CategorySite).filter(models.CategorySite.id == category_site_id, models).first()
 
     if not category_site_query:
             
@@ -118,7 +112,13 @@ async def update_category_site(category_site_id: str, category_site_update: cate
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=403, detail="Somthing is wrong in the process , pleace try later sorry!")
-        
+    
+    category_site_query = db.query(models.CategorySite).filter(models.CategorySite.id == category_site_id).first()
+    
+    category_entertainment_sites = category_site_query.category_entertainment_sites
+    details = [{ 'id': category_entertainment_site.id, 'refnumber': category_entertainment_site.refnumber, 'entertainment_site_id': category_entertainment_site.entertainment_site_id, 'category_site_id': category_entertainment_site.category_site_id, 'active': category_entertainment_site.active} for category_entertainment_site in category_entertainment_sites]
+    category_entertainment_sites = details 
+       
     return jsonable_encoder(category_site_query)
 
 

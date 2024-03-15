@@ -93,18 +93,15 @@ async def detail_profil_by_attribute(refnumber: Optional[str] = None, fucntion: 
     if entertainment_site_id is not None :
         profil_query = db.query(models.Profil).filter(models.Profil.entertainment_site_id == entertainment_site_id, models.Profil.active == "True").order_by(models.Profil.fucntion).offset(skip).limit(limit).all()
     
-    
-    if not profil_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"profil does not exist")
     return jsonable_encoder(profil_query)
 
 
 
 # update an profil request
-@router.put("/update/{profil_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = profils_schemas.ProfilDetail)
+@router.put("/update/{profil_id}", status_code = status.HTTP_200_OK, response_model = profils_schemas.ProfilDetail)
 async def update_profil(profil_id: str, profil_update: profils_schemas.ProfilUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    profil_query = db.query(models.Profil).filter(models.Profil.id == profil_id, models.Profil.active == "True").first()
+    profil_query = db.query(models.Profil).filter(models.Profil.id == profil_id).first()
 
     if not profil_query:
             
@@ -130,7 +127,16 @@ async def update_profil(profil_id: str, profil_update: profils_schemas.ProfilUpd
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=403, detail="Somthing is wrong in the process , pleace try later sorry!")
-        
+    
+    profil_query = db.query(models.Profil).filter(models.Profil.id == profil_id).first()
+    profil_roles = profil_query.profil_roles
+    details = [{ 'id': profil_role.id, 'refnumber': profil_role.refnumber, 'profil_id': profil_role.profil_id, 'role_id': profil_role.role_id, 'active': profil_role.active} for profil_role in profil_roles]
+    profil_roles = details
+    
+    profil_privileges = profil_query.profil_privileges
+    details = [{ 'id': profil_privilege.id, 'refnumber': profil_privilege.refnumber, 'profil_id': profil_privilege.profil_id, 'privilege_id': profil_privilege.privilege_id, 'active': profil_privilege.active} for profil_privilege in profil_privileges]
+    profil_privileges = details
+      
     return jsonable_encoder(profil_query)
 
 
@@ -162,11 +168,7 @@ async def delete_profil(profil_id: str,  db: Session = Depends(get_db), current_
 async def read_profils_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     profils_queries = db.query(models.Profil).filter(models.Profil.active == "False").order_by(models.Profil.fucntion).offset(skip).limit(limit).all()
-    
-    # pas de profil
-    # if not profils_queries:
-    #     raise HTTPException(status_code=404, detail="profils not found")
-                        
+                      
     return jsonable_encoder(profils_queries)
 
 

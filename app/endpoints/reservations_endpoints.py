@@ -54,13 +54,8 @@ async def create_reservation(new_reservation_c: reservations_schemas.Reservation
 async def read_reservations_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     reservations_queries = db.query(models.Reservation).filter(models.Reservation.active == "True").order_by(models.Reservation.created_at).offset(skip).limit(limit).all()
-    
-    # pas de reservation
-    # if not reservations_queries:
-    #     raise HTTPException(status_code=404, detail="reservation not found")
-                        
+                      
     return jsonable_encoder(reservations_queries)
-
 
 
 # Get an reservation
@@ -79,28 +74,22 @@ async def detail_reservation_by_attribute(refnumber: Optional[str] = None, enter
     if nb_personne is not None :
         reservation_query = db.query(models.Reservation).filter(models.Reservation.nb_personne == nb_personne, models.Reservation.active == "True").order_by(models.Reservation.created_at).offset(skip).limit(limit).all()
     
-    
-    if not reservation_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Reservation does not exist")
     return jsonable_encoder(reservation_query)
 
 # Get an reservation
 @router.get("/get/{reservation_id}", status_code=status.HTTP_200_OK, response_model=reservations_schemas.ReservationDetail)
 async def detail_reservation(reservation_id: str, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
-    reservation_query = db.query(models.Reservation).filter(models.Reservation.id == reservation_id, models.Reservation.active == "True").first()
+    reservation_query = db.query(models.Reservation).filter(models.Reservation.id == reservation_id).first()
     if not reservation_query:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"reservation with id: {reservation_id} does not exist")
     return jsonable_encoder(reservation_query)
-
-
-
 
 
 # update an reservation request
 @router.put("/update/{reservation_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = reservations_schemas.ReservationDetail)
 async def update_reservation(reservation_id: str, reservation_update: reservations_schemas.ReservationUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    reservation_query = db.query(models.Reservation).filter(models.Reservation.id == reservation_id, models.Reservation.active == "True").first()
+    reservation_query = db.query(models.Reservation).filter(models.Reservation.id == reservation_id).first()
 
     if not reservation_query:
             
@@ -159,11 +148,7 @@ async def delete_reservation(reservation_id: str,  db: Session = Depends(get_db)
 async def read_reservations_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     reservations_queries = db.query(models.Reservation).filter(models.Reservation.active == "False", ).order_by(models.Reservation.created_at).offset(skip).limit(limit).all()
-    
-    # pas de reservation
-    # if not reservations_queries:
-    #     raise HTTPException(status_code=404, detail="reservations not found")
-                        
+                      
     return jsonable_encoder(reservations_queries)
 
 

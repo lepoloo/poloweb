@@ -54,18 +54,14 @@ async def create_privilege_role(new_privilege_role_c: privilege_roles_schemas.Pr
 async def read_privilege_role_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     privilege_roles_queries = db.query(models.PrivilegeRole).filter(models.PrivilegeRole.active == "True").order_by(models.PrivilegeRole.created_at).offset(skip).limit(limit).all()
-    
-    # pas de privilege
-    # if not privilege_roles_queries:
-    #     raise HTTPException(status_code=404, detail="privilege not found")
-                        
+                      
     return jsonable_encoder(privilege_roles_queries)
 
 
 # Get an privilege role
 @router.get("/get/{privilege_role_id}", status_code=status.HTTP_200_OK, response_model=privilege_roles_schemas.PrivilegeRoleDetail)
 async def detail_privilege_role(privilege_role_id: str, db: Session = Depends(get_db)):
-    privilege_role_query = db.query(models.PrivilegeRole).filter(models.PrivilegeRole.id == privilege_role_id, models.PrivilegeRole.active == "True").first()
+    privilege_role_query = db.query(models.PrivilegeRole).filter(models.PrivilegeRole.id == privilege_role_id).first()
     if not privilege_role_query:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Privilege role with id: {privilege_role_id} does not exist")
     return jsonable_encoder(privilege_role_query)
@@ -82,19 +78,17 @@ async def detail_privilege_role_by_attribute(role_id: Optional[str] = None, priv
         privilege_role_query = db.query(models.PrivilegeRole).filter(models.PrivilegeRole.role_id == role_id, models.PrivilegeRole.active == "True").order_by(models.PrivilegeRole.created_at).offset(skip).limit(limit).all()
     if privilege_id is not None :
         privilege_role_query = db.query(models.PrivilegeRole).filter(models.PrivilegeRole.privilege_role_id == privilege_id, models.PrivilegeRole.active == "True").order_by(models.PrivilegeRole.created_at).offset(skip).limit(limit).all()
-       
-    if not privilege_role_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Privilege role does not exist")
+    
     
     return jsonable_encoder(privilege_role_query)
 
 
 
 # update an pivilege role request
-@router.put("/update/{privilege_role_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = privilege_roles_schemas.PrivilegeRoleDetail)
+@router.put("/update/{privilege_role_id}", status_code = status.HTTP_200_OK, response_model = privilege_roles_schemas.PrivilegeRoleDetail)
 async def update_privilege_role(privilege_role_id: str, privilege_role_update: privilege_roles_schemas.PrivilegeRoleUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    privilege_role_query = db.query(models.PrivilegeRole).filter(models.PrivilegeRole.id == privilege_role_id, models.PrivilegeRole.active == "True").first()
+    privilege_role_query = db.query(models.PrivilegeRole).filter(models.PrivilegeRole.id == privilege_role_id).first()
 
     if not privilege_role_query:
             
@@ -146,11 +140,7 @@ async def delete_privilege_role(privilege_role_id: str,  db: Session = Depends(g
 async def read_privileges_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     privilege_roles_queries = db.query(models.PrivilegeRole).filter(models.PrivilegeRole.active == "False").order_by(models.PrivilegeRole.created_at).offset(skip).limit(limit).all()
-    
-    # pas de privilege role
-    # if not privilege_roles_queries:
-    #     raise HTTPException(status_code=404, detail="privileges roles not found")
-                        
+                       
     return jsonable_encoder(privilege_roles_queries)
 
 

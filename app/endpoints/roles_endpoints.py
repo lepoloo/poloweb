@@ -53,18 +53,14 @@ async def create_role(new_role_c: roles_schemas.RoleCreate, db: Session = Depend
 async def read_role_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     roles_queries = db.query(models.Role).filter(models.Role.active == "True").order_by(models.Role.name).offset(skip).limit(limit).all()
-    
-    # pas de role
-    # if not roles_queries:
-    #     raise HTTPException(status_code=404, detail="Role not found")
-                        
+                     
     return jsonable_encoder(roles_queries)
 
 
 # Get an role
 @router.get("/get/{role_id}", status_code=status.HTTP_200_OK, response_model=roles_schemas.RoleDetail)
 async def detail_role(role_id: str, db: Session = Depends(get_db)):
-    role_query = db.query(models.Role).filter(models.Role.id == role_id, models.Role.active == "True").first()
+    role_query = db.query(models.Role).filter(models.Role.id == role_id).first()
     if not role_query:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Role with id: {role_id} does not exist")
     
@@ -79,8 +75,6 @@ async def detail_role(role_id: str, db: Session = Depends(get_db)):
     return jsonable_encoder(role_query)
 
 
-
-
 # Get an role
 # "/get_role_impersonal/?name=value_name&description=valeur_description" : Retourne `{"param1": "value1", "param2": 42, "param3": null}`.
 @router.get("/get_role_by_attribute/", status_code=status.HTTP_200_OK, response_model=List[roles_schemas.RoleListing])
@@ -92,17 +86,15 @@ async def detail_role_by_attribute(name: Optional[str] = None, description: Opti
         role_query = db.query(models.Role).filter(models.Role.description.contains(description), models.Role.active == "True").order_by(models.Role.name).offset(skip).limit(limit).all()
        
     
-    if not role_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Role does not exist")
     return jsonable_encoder(role_query)
 
 
 
 # update an permission request
-@router.put("/update/{role_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = roles_schemas.RoleDetail)
+@router.put("/update/{role_id}", status_code = status.HTTP_200_OK, response_model = roles_schemas.RoleDetail)
 async def update_role(role_id: str, role_update: roles_schemas.RoleUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    role_query = db.query(models.Role).filter(models.Role.id == role_id, models.Role.active == "True").first()
+    role_query = db.query(models.Role).filter(models.Role.id == role_id).first()
 
     if not role_query:
             
@@ -122,7 +114,16 @@ async def update_role(role_id: str, role_update: roles_schemas.RoleUpdate, db: S
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=403, detail="Somthing is wrong in the process , pleace try later sorry!")
-        
+    
+    role_query = db.query(models.Role).filter(models.Role.id == role_id).first()
+    profil_roles = role_query.profil_roles
+    details = [{ 'id': profil_role.id, 'refnumber': profil_role.refnumber, 'profil_id': profil_role.profil_id, 'role_id': profil_role.role_id, 'active': profil_role.active} for profil_role in profil_roles]
+    profil_roles = details
+    
+    privilege_roles = role_query.privilege_roles
+    details = [{ 'id': privilege_role.id, 'refnumber': privilege_role.refnumber, 'privilege_id': privilege_role.privilege_id, 'privilege_id': privilege_role.privilege_id, 'active': privilege_role.active} for privilege_role in privilege_roles]
+    privilege_roles = details    
+    
     return jsonable_encoder(role_query)
 
 
@@ -154,11 +155,7 @@ async def delete_role(role_id: str,  db: Session = Depends(get_db), current_user
 async def read_roles_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     roles_queries = db.query(models.Role).filter(models.Role.active == "False").order_by(models.Role.name).offset(skip).limit(limit).all()
-    
-    # pas de role
-    # if not roles_queries:
-    #     raise HTTPException(status_code=404, detail="roles not found")
-                        
+                      
     return jsonable_encoder(roles_queries)
 
 

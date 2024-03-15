@@ -54,11 +54,7 @@ async def create_label_event(new_label_event_c: label_events_schemas.LabelEventC
 async def read_label_event_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     label_events_queries = db.query(models.LabelEvent).filter(models.LabelEvent.active == "True").order_by(models.LabelEvent.name).offset(skip).limit(limit).all()
-    
-    # pas de label_event
-    # if not label_events_queries:
-    #     raise HTTPException(status_code=404, detail="Type product not found")
-                        
+                       
     return jsonable_encoder(label_events_queries)
 
 
@@ -76,8 +72,6 @@ async def detail_label_event(label_event_id: str, db: Session = Depends(get_db))
     return jsonable_encoder(label_event_query)
 
 
-
-
 # Get an label_event
 # "/get_label_event_impersonal/?name=value_name&description=valeur_description" : Retourne `{"param1": "value1", "param2": 42, "param3": null}`.
 @router.get("/get_label_event_by_attribute/", status_code=status.HTTP_200_OK, response_model=List[label_events_schemas.LabelEventListing])
@@ -88,18 +82,15 @@ async def detail_label_event_by_attribute(name: Optional[str] = None, descriptio
     if description is not None :
         label_event_query = db.query(models.LabelEvent).filter(models.LabelEvent.description.contains(description), models.LabelEvent.active == "True").order_by(models.LabelEvent.name).offset(skip).limit(limit).all()
        
-    
-    if not label_event_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"label_event does not exist")
     return jsonable_encoder(label_event_query)
 
 
 
 # update an permission request
-@router.put("/update/{label_event_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = label_events_schemas.LabelEventDetail)
+@router.put("/update/{label_event_id}", status_code = status.HTTP_200_OK, response_model = label_events_schemas.LabelEventDetail)
 async def update_label_event(label_event_id: str, label_event_update: label_events_schemas.LabelEventUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    label_event_query = db.query(models.LabelEvent).filter(models.LabelEvent.id == label_event_id, models.LabelEvent.active == "True").first()
+    label_event_query = db.query(models.LabelEvent).filter(models.LabelEvent.id == label_event_id).first()
 
     if not label_event_query:
             
@@ -119,7 +110,12 @@ async def update_label_event(label_event_id: str, label_event_update: label_even
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=403, detail="Somthing is wrong in the process , pleace try later sorry!")
-        
+    
+    label_event_query = db.query(models.LabelEvent).filter(models.LabelEvent.id == label_event_id).first()
+    events = label_event_query.events
+    details = [{ 'id': event.id, 'refnumber': event.refnumber, 'name': event.name, 'description': event.description, 'label_event_id': event.label_event_id, 'entertainment_site_id': event.entertainment_site_id, 'start_date': event.start_date, 'end_date': event.end_date, 'start_hour': event.start_hour, 'end_hour': event.end_hour, 'nb_visite': event.nb_visite, 'active': event.active} for event in events]
+    events = details
+       
     return jsonable_encoder(label_event_query)
 
 
@@ -151,11 +147,7 @@ async def delete_label_event(label_event_id: str,  db: Session = Depends(get_db)
 async def read_label_events_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     label_events_queries = db.query(models.LabelEvent).filter(models.LabelEvent.active == "False").order_by(models.LabelEvent.name).offset(skip).limit(limit).all()
-    
-    # pas de label_event
-    # if not label_events_queries:
-    #     raise HTTPException(status_code=404, detail="label_events not found")
-                        
+                       
     return jsonable_encoder(label_events_queries)
 
 

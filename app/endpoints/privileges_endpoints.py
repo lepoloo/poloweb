@@ -54,11 +54,7 @@ async def create_privilege(new_privilege_c: privileges_schemas.PrivilegeCreate, 
 async def read_privilege_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     privileges_queries = db.query(models.Privilege).filter(models.Privilege.active == "True").order_by(models.Privilege.name).offset(skip).limit(limit).all()
-    
-    # pas de privilege
-    # if not privileges_queries:
-    #     raise HTTPException(status_code=404, detail="privilege not found")
-                        
+                      
     return jsonable_encoder(privileges_queries)
 
 
@@ -92,15 +88,12 @@ async def detail_privilege_by_attribute(name: Optional[str] = None, description:
     if description is not None :
         privilege_query = db.query(models.Privilege).filter(models.Privilege.description.contains(description)).order_by(models.Privilege.name).offset(skip).limit(limit).all()
        
-    
-    if not privilege_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"privilege does not exist")
     return jsonable_encoder(privilege_query)
 
 
 
 # update an permission request
-@router.put("/update/{privilege_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = privileges_schemas.PrivilegeDetail)
+@router.put("/update/{privilege_id}", status_code = status.HTTP_200_OK, response_model = privileges_schemas.PrivilegeDetail)
 async def update_privilege(privilege_id: str, privilege_update: privileges_schemas.PrivilegeUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
     privilege_query = db.query(models.Privilege).filter(models.Privilege.id == privilege_id, models.Privilege.active == "True").first()
@@ -123,7 +116,16 @@ async def update_privilege(privilege_id: str, privilege_update: privileges_schem
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=403, detail="Somthing is wrong in the process , pleace try later sorry!")
-        
+    
+    privilege_query = db.query(models.Privilege).filter(models.Privilege.id == privilege_id).first()
+    privilege_roles = privilege_query.privilege_roles
+    details = [{ 'id': privilege_role.id, 'refnumber': privilege_role.refnumber, 'privilege_id': privilege_role.privilege_id, 'privilege_id': privilege_role.privilege_id, 'active': privilege_role.active} for privilege_role in privilege_roles]
+    privilege_roles = details
+    
+    profil_privileges = privilege_query.profil_privileges
+    details = [{ 'id': profil_privilege.id, 'refnumber': profil_privilege.refnumber, 'profil_id': profil_privilege.profil_id, 'privilege_id': profil_privilege.privilege_id, 'active': profil_privilege.active} for profil_privilege in profil_privileges]
+    profil_privileges = details 
+       
     return jsonable_encoder(privilege_query)
 
 
@@ -155,11 +157,7 @@ async def delete_privilege(privilege_id: str,  db: Session = Depends(get_db), cu
 async def read_privileges_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     privileges_queries = db.query(models.Privilege).filter(models.Privilege.active == "False").order_by(models.Privilege.name).offset(skip).limit(limit).all()
-    
-    # pas de privilege
-    # if not privileges_queries:
-    #     raise HTTPException(status_code=404, detail="privileges not found")
-                        
+                     
     return jsonable_encoder(privileges_queries)
 
 

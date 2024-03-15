@@ -50,11 +50,7 @@ async def create_comment(new_comment_c: comments_schemas.CommentCreate, db: Sess
 async def read_comments_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     comments_queries = db.query(models.Comment).filter(models.Comment.active == "True").order_by(models.Comment.created_at).offset(skip).limit(limit).all()
-    
-    # pas de comment
-    # if not comments_queries:
-    #     raise HTTPException(status_code=404, detail="comment not found")
-                        
+                      
     return jsonable_encoder(comments_queries)
 
 
@@ -73,10 +69,6 @@ async def detail_comment_by_attribute(refnumber: Optional[str] = None, entertain
     if content is not None:
         comment_query = db.query(models.Comment).filter(models.Comment.content.contains(content), models.Comment.active == "True").order_by(models.Comment.created_at).offset(skip).limit(limit).all()
     
-    
-    
-    if not comment_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"comment does not exist")
     return jsonable_encoder(comment_query)
 
 # Get an comment
@@ -89,13 +81,11 @@ async def detail_comment(comment_id: str, db: Session = Depends(get_db)):
 
 
 
-
-
 # update an comment request
-@router.put("/update/{comment_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = comments_schemas.CommentDetail)
+@router.put("/update/{comment_id}", status_code = status.HTTP_200_OK, response_model = comments_schemas.CommentDetail)
 async def update_comment(comment_id: str, comment_update: comments_schemas.CommentUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    comment_query = db.query(models.Comment).filter(models.Comment.id == comment_id, models.Comment.active == "True").first()
+    comment_query = db.query(models.Comment).filter(models.Comment.id == comment_id).first()
 
     if not comment_query:
             
@@ -150,11 +140,7 @@ async def delete_comment(comment_id: str,  db: Session = Depends(get_db), curren
 async def read_comments_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db),current_user : str = Depends(oauth2.get_current_user)):
     
     comments_queries = db.query(models.Comment).filter(models.Comment.active == "False", ).order_by(models.Comment.created_at).offset(skip).limit(limit).all()
-    
-    # pas de comment
-    # if not comments_queries:
-    #     raise HTTPException(status_code=404, detail="comments not found")
-                        
+                     
     return jsonable_encoder(comments_queries)
 
 

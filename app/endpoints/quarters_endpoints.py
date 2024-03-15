@@ -53,10 +53,7 @@ async def read_quarters_actif(skip: int = 0, limit: int = 100, db: Session = Dep
     
     quarters_queries = db.query(models.Quarter).filter(models.Quarter.active == "True").order_by(models.Quarter.name).offset(skip).limit(limit).all()
     
-    # pas de quarter
-    # if not quarters_queries:
-    #     raise HTTPException(status_code=404, detail="Quarter not found")
-                        
+                 
     return jsonable_encoder(quarters_queries)
 
 
@@ -81,7 +78,7 @@ async def detail_quarter_by_attribute(refnumber: Optional[str] = None, town_id: 
 # Get an quarter
 @router.get("/get/{quarter_id}", status_code=status.HTTP_200_OK, response_model=quarters_schemas.QuarterDetail)
 async def detail_quarter(quarter_id: str, db: Session = Depends(get_db)):
-    quarter_query = db.query(models.Quarter).filter(models.Quarter.id == quarter_id, models.Quarter.active == "True").first()
+    quarter_query = db.query(models.Quarter).filter(models.Quarter.id == quarter_id).first()
     if not quarter_query:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"quarter with id: {quarter_id} does not exist")
     
@@ -92,14 +89,11 @@ async def detail_quarter(quarter_id: str, db: Session = Depends(get_db)):
     return jsonable_encoder(quarter_query)
 
 
-
-
-
 # update an quarter request
-@router.put("/update/{quarter_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = quarters_schemas.QuarterDetail)
+@router.put("/update/{quarter_id}", status_code = status.HTTP_200_OK, response_model = quarters_schemas.QuarterDetail)
 async def update_quarter(quarter_id: str, quarter_update: quarters_schemas.QuarterUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    quarter_query = db.query(models.Quarter).filter(models.Quarter.id == quarter_id, models.Quarter.active == "True").first()
+    quarter_query = db.query(models.Quarter).filter(models.Quarter.id == quarter_id).first()
 
     if not quarter_query:
             
@@ -120,6 +114,11 @@ async def update_quarter(quarter_id: str, quarter_update: quarters_schemas.Quart
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=403, detail="Somthing is wrong in the process , pleace try later sorry!")
+    
+    quarter_query = db.query(models.Quarter).filter(models.Quarter.id == quarter_id).first()
+    entertainment_sites = quarter_query.entertainment_sites
+    details = [{ 'id': entertainment_site.id, 'refnumber': entertainment_site.refnumber, 'name': entertainment_site.name, 'description': entertainment_site.description, 'address': entertainment_site.address, 'longitude': entertainment_site.longitude, 'latitude': entertainment_site.latitude, 'quarter_id': entertainment_site.quarter_id, 'owner_id': entertainment_site.owner_id, 'nb_visite': entertainment_site.nb_visite, 'active': entertainment_site.active} for entertainment_site in entertainment_sites]
+    entertainment_sites = details
         
     return jsonable_encoder(quarter_query)
 
@@ -152,11 +151,7 @@ async def delete_quarter(quarter_id: str,  db: Session = Depends(get_db), curren
 async def read_quarters_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     quarters_queries = db.query(models.Quarter).filter(models.Quarter.active == "False", ).order_by(models.Quarter.name).offset(skip).limit(limit).all()
-    
-    # pas de quarter
-    # if not quarters_queries:
-    #     raise HTTPException(status_code=404, detail="quarters not found")
-                        
+                    
     return jsonable_encoder(quarters_queries)
 
 

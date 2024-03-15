@@ -52,19 +52,14 @@ async def create_profil_privilege(new_profil_privilege_c: profil_privileges_sche
 async def read_profil_privileges_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     profil_privileges_queries = db.query(models.ProfilPrivilege).filter(models.ProfilPrivilege.active == "True").order_by(models.ProfilPrivilege.created_at).offset(skip).limit(limit).all()
-    
-    # pas de profil_privilege
-    # if not profil_privileges_queries:
-    #     raise HTTPException(status_code=404, detail="profil_privilege not found")
-                        
+                       
     return jsonable_encoder(profil_privileges_queries)
 
 # Get an profil_privilege
 @router.get("/get/{profil_privilege_id}", status_code=status.HTTP_200_OK, response_model=profil_privileges_schemas.ProfilPrivilegeDetail)
 async def detail_profil_privilege(profil_privilege_id: str, db: Session = Depends(get_db)):
     profil_privilege_query = db.query(models.ProfilPrivilege).filter(models.ProfilPrivilege.id == profil_privilege_id).first()
-    if not profil_privilege_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"profil_privilege with id: {profil_privilege_id} does not exist")
+    
     return jsonable_encoder(profil_privilege_query)
 
 # Get an profil_privilege
@@ -79,18 +74,15 @@ async def detail_profil_privilege_by_attribute(refnumber: Optional[str] = None, 
     if privilege_id is not None :
         profil_privilege_query = db.query(models.ProfilPrivilege).filter(models.ProfilPrivilege.privilege_id == privilege_id, models.ProfilPrivilege.active == "True").order_by(models.ProfilPrivilege.created_at).offset(skip).limit(limit).all()
     
-    
-    if not profil_privilege_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"profil_privilege does not exist")
     return jsonable_encoder(profil_privilege_query)
 
 
 
 # update an profil_privilege  request
-@router.put("/update/{profil_privilege_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = profil_privileges_schemas.ProfilPrivilegeDetail)
+@router.put("/update/{profil_privilege_id}", status_code = status.HTTP_200_OK, response_model = profil_privileges_schemas.ProfilPrivilegeDetail)
 async def update_profil_privilege(profil_privilege_id: str, profil_privilege_update: profil_privileges_schemas.ProfilPrivilegeUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    profil_privilege_query = db.query(models.ProfilPrivilege).filter(models.ProfilPrivilege.id == profil_privilege_id, models.ProfilPrivilege.active == "True").first()
+    profil_privilege_query = db.query(models.ProfilPrivilege).filter(models.ProfilPrivilege.id == profil_privilege_id).first()
 
     if not profil_privilege_query:
             
@@ -141,11 +133,7 @@ async def delete_profil_privilege(profil_privilege_id: str,  db: Session = Depen
 async def read_profil_privileges_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     profil_privileges_queries = db.query(models.ProfilPrivilege).filter(models.ProfilPrivilege.active == "False").order_by(models.ProfilPrivilege.created_at).offset(skip).limit(limit).all()
-    
-    # pas de profil_privilege
-    # if not profil_privileges_queries:
-    #     raise HTTPException(status_code=404, detail="profil_privileges not found")
-                        
+                       
     return jsonable_encoder(profil_privileges_queries)
 
 

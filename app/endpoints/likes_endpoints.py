@@ -73,11 +73,7 @@ async def create_like(new_like_c: likes_schemas.LikeCreate, db: Session = Depend
 async def read_likes_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     likes_queries = db.query(models.Like).filter(models.Like.active == "True").order_by(models.Like.create_at).offset(skip).limit(limit).all()
-    
-    # pas de like
-    # if not likes_queries:
-    #     raise HTTPException(status_code=404, detail="like not found")
-                        
+                       
     return jsonable_encoder(likes_queries)
 
 
@@ -99,10 +95,6 @@ async def detail_like_by_attribute(refnumber: Optional[str] = None, event_id: Op
         like_query = db.query(models.Like).filter(models.Like.reel_id == reel_id).order_by(models.Like.create_at).offset(skip).limit(limit).all()
     if story_id is not None :
         like_query = db.query(models.Like).filter(models.Like.story_id == story_id).order_by(models.Like.create_at).offset(skip).limit(limit).all()
-    
-    
-    if not like_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"like does not exist")
     
     return jsonable_encoder(like_query)
 

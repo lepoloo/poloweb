@@ -54,11 +54,7 @@ async def create_product(new_product_c: products_schemas.ProductCreate, db: Sess
 async def read_products_actif(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     
     products_queries = db.query(models.Product).filter(models.Product.active == "True").order_by(models.Product.name).offset(skip).limit(limit).all()
-    
-    # pas de product
-    # if not products_queries:
-    #     raise HTTPException(status_code=404, detail="product not found")
-                        
+                      
     return jsonable_encoder(products_queries)
 
 
@@ -80,19 +76,16 @@ async def detail_product_by_attribute(refnumber: Optional[str] = None, type_prod
         product_query = db.query(models.Product).filter(models.Product.price == price, models.Product.active == "True").order_by(models.Product.name).offset(skip).limit(limit).all()
     
     
-    if not product_query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"product does not exist")
     return jsonable_encoder(product_query)
 
 # Get an product
 @router.get("/get/{product_id}", status_code=status.HTTP_200_OK, response_model=products_schemas.ProductDetail)
 async def detail_product(product_id: str, db: Session = Depends(get_db)):
-    product_query = db.query(models.Product).filter(models.Product.id == product_id, models.Product.active == "True").first()
+    product_query = db.query(models.Product).filter(models.Product.id == product_id).first()
     if not product_query:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"product with id: {product_id} does not exist")
     
     menus = product_query.menus
-    
     details = [{ 'id': menu.id, 'refnumber': menu.refnumber, 'card_id': menu.card_id, 'product_id': menu.product_id, 'price': menu.price, 'active': menu.active} for menu in menus]
     menus = details
         
@@ -100,13 +93,11 @@ async def detail_product(product_id: str, db: Session = Depends(get_db)):
 
 
 
-
-
 # update an permission request
-@router.put("/update/{product_id}", status_code = status.HTTP_205_RESET_CONTENT, response_model = products_schemas.ProductDetail)
+@router.put("/update/{product_id}", status_code = status.HTTP_200_OK, response_model = products_schemas.ProductDetail)
 async def update_product(product_id: str, product_update: products_schemas.ProductUpdate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
         
-    product_query = db.query(models.Product).filter(models.Product.id == product_id, models.Product.active == "True").first()
+    product_query = db.query(models.Product).filter(models.Product.id == product_id).first()
 
     if not product_query:
             
@@ -131,7 +122,13 @@ async def update_product(product_id: str, product_update: products_schemas.Produ
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=403, detail="Somthing is wrong in the process , pleace try later sorry!")
-        
+    
+    product_query = db.query(models.Product).filter(models.Product.id == product_id).first()
+    
+    menus = product_query.menus
+    details = [{ 'id': menu.id, 'refnumber': menu.refnumber, 'card_id': menu.card_id, 'product_id': menu.product_id, 'price': menu.price, 'active': menu.active} for menu in menus]
+    menus = details    
+    
     return jsonable_encoder(product_query)
 
 
@@ -163,11 +160,7 @@ async def delete_product(product_id: str,  db: Session = Depends(get_db), curren
 async def read_products_inactive(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     products_queries = db.query(models.Product).filter(models.Product.active == "False", ).order_by(models.Product.name).offset(skip).limit(limit).all()
-    
-    # pas de product
-    # if not products_queries:
-    #     raise HTTPException(status_code=404, detail="products not found")
-                        
+                       
     return jsonable_encoder(products_queries)
 
 
