@@ -8,10 +8,12 @@ from typing import List
 from sqlalchemy.exc import SQLAlchemyError
 from app.models import models
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime
 from app.database import engine, get_db
 from typing import Optional
 from  utils import oauth2
+from typing import Annotated
+# from  utils.users_utils import generate_unique_num_ref
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 models.Base.metadata.create_all(bind=engine)
@@ -22,7 +24,8 @@ router = APIRouter(prefix = "/anounce_multimedia", tags=['Anounce Multimedias Re
  
 # create a new anounce_multimedia sheet
 @router.post("/create/", status_code = status.HTTP_201_CREATED, response_model=anounce_multimedias_schemas.AnounceMultimediaListing)
-async def create_anounce_multimedia(new_anounce_multimedia_c: anounce_multimedias_schemas.AnounceMultimediaCreate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
+async def create_anounce_multimedia(file: Annotated[bytes, File()], new_anounce_multimedia_c: anounce_multimedias_schemas.AnounceMultimediaCreate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
+# async def create_anounce_multimedia(new_anounce_multimedia_c: anounce_multimedias_schemas.AnounceMultimediaCreate, db: Session = Depends(get_db), current_user : str = Depends(oauth2.get_current_user)):
     
     formated_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")# Formatage de la date au format souhaité (par exemple, YYYY-MM-DD HH:MM:SS)
     concatenated_uuid = str(uuid.uuid4())+ ":" + formated_date
@@ -31,6 +34,10 @@ async def create_anounce_multimedia(new_anounce_multimedia_c: anounce_multimedia
     concatenated_num_ref = str(
             NUM_REF + len(db.query(models.AnounceMultimedia).filter(models.AnounceMultimedia.refnumber.endswith(codefin)).all())) + "/" + codefin
     
+    # reference = generate_unique_num_ref('models.AnounceMultimedia', db)
+    # print(reference)
+    # concatenated_num_ref = reference['concatenated_num_ref']
+    # concatenated_uuid = reference['concatenated_uuid']
     author = current_user.id
     
     new_anounce_multimedia= models.AnounceMultimedia(id = concatenated_uuid, **new_anounce_multimedia_c.dict(), refnumber = concatenated_num_ref, created_by = author)

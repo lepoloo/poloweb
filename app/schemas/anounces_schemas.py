@@ -11,6 +11,12 @@ class Anounce(BaseModel):
     description: str = Field(..., max_length=65535)
     duration: int
     end_date: datetime
+    class Config:
+        allow_mutation = False
+        use_enum_values = True
+        json_encoders = {
+            datetime: lambda v: v.replace(tzinfo=None).isoformat() if v else None
+        }
 
     
     
@@ -49,4 +55,9 @@ class AnounceUpdate(BaseModel):
     nb_visite: Optional[int] = Field(None, ge=0)
     duration: Optional[constr(max_length=256)] = None
     end_date: Optional[datetime] = None
-    # active: bool = True
+    class Config:
+        allow_mutation = False
+        use_enum_values = True
+        json_encoders = {
+            datetime: lambda v: v.replace(tzinfo=None).isoformat() if v else None
+        }

@@ -15,10 +15,13 @@ load_dotenv('.env')
 from fastapi import HTTPException, Depends
 from sqlalchemy.orm import Session
 from app.database import  get_db
-from app.models import models as models
 from app.database import engine, get_db
 from app.models import models
 from typing import Optional
+from datetime import datetime
+import uuid
+from app.database import engine, get_db
+from sqlalchemy.orm import Session
 
 
 from passlib.context import CryptContext
@@ -61,6 +64,21 @@ def send_email(to_email: str, subject: str, content: str):
         server.login(smtp_username, smtp_password)
         server.send_message(msg)
 
+    
+# def generate_unique_num_ref(model_name: str, db: Session = Depends(get_db)):
+#     print(model_name)
+#     formated_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#     concatenated_uuid = str(uuid.uuid4()) + ":" + formated_date
+#     NUM_REF = 10001
+#     codefin = datetime.now().strftime("%m/%Y")
+#     concatenated_num_ref = str(
+#         NUM_REF + len(db.query(model_name).filter(model_name.refnumber.endswith(codefin)).all())) + "/" + codefin
+
+#     return {
+#         'concatenated_num_ref': concatenated_num_ref,
+#         'concatenated_uuid': concatenated_uuid,
+#         'formated_date': formated_date
+#     }
 
 # def get_privileges(
 #     user_id: Optional[str]= None,

@@ -16,6 +16,12 @@ class Event(BaseModel):
     end_date: datetime
     start_hour: str
     end_hour: str
+    class Config:
+        allow_mutation = False
+        use_enum_values = True
+        json_encoders = {
+            datetime: lambda v: v.replace(tzinfo=None).isoformat() if v else None
+        }
     
     
 
@@ -56,5 +62,10 @@ class EventUpdate(BaseModel):
     end_date: Optional[datetime] = None
     start_hour: Optional[constr(max_length=256)] = None
     end_hour: Optional[constr(max_length=256)] = None
-    # active: bool = True
+    class Config:
+        allow_mutation = False
+        use_enum_values = True
+        json_encoders = {
+            datetime: lambda v: v.replace(tzinfo=None).isoformat() if v else None
+        }
    
